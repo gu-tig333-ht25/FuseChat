@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'pages/profile_view.dart';
 
 void main() {
   runApp(MyApp());
@@ -31,7 +32,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: ProfileView(), //MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }
