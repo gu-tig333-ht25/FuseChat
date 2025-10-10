@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../data/dummy_conversation_data.dart';
 import '../auth/auth_screen.dart';
 
@@ -18,7 +19,13 @@ class _ConversationScreenState extends State<ConversationScreen> {
   Widget build(context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Conversations'),
+        title: Text(
+          'FuseChat',
+          style: GoogleFonts.irishGrover(
+            fontSize: 28,
+            color: Colors.white,
+          ),
+        ),
         leading: IconButton(
           onPressed: () async {
             await FirebaseAuth.instance.signOut();

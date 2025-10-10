@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'firebase_options.dart';
+import 'auth/firebase_options.dart';
 import 'auth/auth_screen.dart';
 import 'theme/themedata.dart';
 import 'pages/conversation_screen.dart';

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../pages/conversation_screen.dart';
 
 class AuthScreen extends StatefulWidget {
@@ -137,21 +138,18 @@ class _AuthScreenState extends State<AuthScreen> {
                 // FuseChat logo with bomb icon
                 Column(
                   children: [
-                    const Text(
+                    Text(
                       'FuseChat',
-                      style: TextStyle(
+                      style: GoogleFonts.irishGrover(
                         color: Colors.white,
-                        fontSize: 56,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 4,
-                        fontFamily: 'monospace',
+                        fontSize: 80,
                         shadows: [
-                          Shadow(
+                          const Shadow(
                             offset: Offset(0, 0),
                             blurRadius: 20,
                             color: Colors.white24,
                           ),
-                          Shadow(
+                          const Shadow(
                             offset: Offset(2, 2),
                             blurRadius: 4,
                             color: Colors.black54,
@@ -159,7 +157,7 @@ class _AuthScreenState extends State<AuthScreen> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 40),
+                    const SizedBox(height: 30),
                     // Bomb icon
                     Container(
                       width: 200,
@@ -177,7 +175,7 @@ class _AuthScreenState extends State<AuthScreen> {
                   ],
                 ),
                 
-                const Spacer(flex: 3),
+                const SizedBox(height: 40),
                 
                 // Email field
                 Column(
