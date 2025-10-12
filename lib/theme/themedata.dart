@@ -24,7 +24,7 @@ final ThemeData fuseChatDarkTheme = ThemeData(
       color: Colors.white,
     ),
   ),
-  cardColor: Color(0xFF1E1E1E),
+  cardColor: Color(0xFF282121),
   searchBarTheme: const SearchBarThemeData(
     backgroundColor: WidgetStatePropertyAll(Colors.white),
     textStyle: WidgetStatePropertyAll(TextStyle(color: Colors.black)),

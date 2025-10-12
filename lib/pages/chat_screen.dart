@@ -50,28 +50,31 @@ class _ChatScreenState extends State<ChatScreen> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 Expanded(
-                  child: TextField(
-                    controller: messageTextController,
-                    autofocus: true,
-                    decoration: const InputDecoration(
-                      hintText: 'Type a message...',
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: TextField(
+                      controller: messageTextController,
+                      autofocus: true,
+                      decoration: const InputDecoration(
+                        hintText: 'Type a message...',
+                      ),
+                      onSubmitted: (String text) {
+                        setState(() {
+                          // 2do: Implement Firebase send functionality
+                          Conversation conv =
+                              dummyConversations[widget.convIndex];
+                          conv.messages.add(
+                            Message(
+                              id: 'm${conv.messages.length + 1}',
+                              senderId: currentUser.id,
+                              text: messageTextController.text,
+                              timestamp: DateTime.now(),
+                            ),
+                          );
+                        });
+                        messageTextController.clear();
+                      },
                     ),
-                    onSubmitted: (String text) {
-                      setState(() {
-                        // 2do: Implement Firebase send functionality
-                        Conversation conv =
-                            dummyConversations[widget.convIndex];
-                        conv.messages.add(
-                          Message(
-                            id: 'm${conv.messages.length + 1}',
-                            senderId: currentUser.id,
-                            text: messageTextController.text,
-                            timestamp: DateTime.now(),
-                          ),
-                        );
-                      });
-                      messageTextController.clear();
-                    },
                   ),
                 ),
               ],
