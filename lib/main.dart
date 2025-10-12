@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'theme/themedata.dart';
 import 'pages/login_screen.dart';
+import 'pages/chat_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -16,7 +17,7 @@ class MyApp extends StatelessWidget {
       title: 'FuseChat',
       theme: fuseChatDarkTheme,
       debugShowCheckedModeBanner: false,
-      home: LoginScreen(),
+      home: ChatScreen(convIndex: 0), //LoginScreen(),
     );
   }
 }

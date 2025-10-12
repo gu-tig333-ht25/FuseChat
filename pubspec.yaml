@@ -34,6 +34,8 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
+  #firebase_auth: ^6.1.0
+  #cloud_firestore: ^6.0.2
 
 dev_dependencies:
   flutter_test:
@@ -65,7 +67,15 @@ flutter:
     - family: IrishGrover
       fonts:
         - asset: lib/assets/IrishGrover-Regular.ttf
-
+    - family: Inter
+      fonts:
+        - asset: lib/assets/Inter-Italic-VariableFont_opsz,wght.ttf
+        - asset: lib/assets/Inter-VariableFont_opsz,wght.ttf
+    - family: InstrumentSans
+      fonts:
+        - asset: lib/assets/InstrumentSans-VariableFont_wdth,wght.ttf
+        - asset: lib/assets/InstrumentSans-Italic-VariableFont_wdth,wght.ttf
+        
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg
