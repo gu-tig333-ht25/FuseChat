@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 final ThemeData fuseChatDarkTheme = ThemeData(
   useMaterial3: true,
@@ -10,14 +11,13 @@ final ThemeData fuseChatDarkTheme = ThemeData(
     surface: Color(0xFF1E1E1E),
     onSurface: Colors.grey,
   ),
-  appBarTheme: const AppBarTheme(
+  appBarTheme: AppBarTheme(
     backgroundColor: Colors.transparent,
     surfaceTintColor: Colors.transparent,
     elevation: 0,
     foregroundColor: Colors.white,
     centerTitle: true,
-    titleTextStyle: TextStyle(
-      fontFamily: 'InstrumentSans',
+    titleTextStyle: GoogleFonts.instrumentSans(
       fontSize: 20,
       fontWeight: FontWeight.w600,
       letterSpacing: 1.5,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:template/models/conversation_model.dart';
 //import 'package:firebase_auth/firebase_auth.dart';
 //import 'package:cloud_firestore/cloud_firestore.dart';
@@ -8,6 +9,7 @@ import '../models/message_model.dart';
 // 2do
 // Add references to Firebase, get current user, send messages to Firestore, and get messages from Firestore
 // Add LLM suggestions
+// ...
 // Fix spacing between messages etc.
 // Set chat title based on conversation
 // auto focus to text field https://docs.flutter.dev/cookbook/forms/focus
@@ -33,7 +35,7 @@ class _ChatScreenState extends State<ChatScreen> {
           children: <Widget>[
             Expanded(child: DummyMessagesStream(convIndex: widget.convIndex)),
             Card(
-              color: Theme.of(context).cardColor,
+              color: Color(0xFF303030),
               margin: const EdgeInsets.all(8.0),
               child: Padding(
                 padding: const EdgeInsets.symmetric(
@@ -182,8 +184,7 @@ class MessageBubble extends StatelessWidget {
                   ),
                   child: Text(
                     text,
-                    style: TextStyle(
-                      fontFamily: 'Inter',
+                    style: GoogleFonts.inter(
                       fontWeight: FontWeight.w500,
                       color: isMe ? Colors.white : Colors.black,
                       fontSize: 14.0,
