@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'stat_card.dart';
-import 'settings_tile.dart';
+import '../settings_tile.dart';
 
 class ProfileView extends StatefulWidget {
   @override

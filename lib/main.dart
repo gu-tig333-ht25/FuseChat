@@ -1,7 +1,24 @@
 import 'package:flutter/material.dart';
-import 'pages/profile_view.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'auth/firebase_options.dart';
+import 'auth/auth_screen.dart';
+import 'theme/themedata.dart';
+import 'pages/conversation_screen.dart';
+import 'pages/profile_view/profile_view.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    print('Firebase initialized');
+  } catch (e) {
+    print('Firebase initialization failed: $e');
+  }
+
   runApp(MyApp());
 }
 
@@ -13,7 +30,6 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
-      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -115,11 +131,6 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }

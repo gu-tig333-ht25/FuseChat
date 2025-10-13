@@ -1,0 +1,103 @@
+import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../data/dummy_conversation_data.dart';
+import '../auth/auth_screen.dart';
+
+class ConversationScreen extends StatefulWidget {
+  const ConversationScreen({super.key});
+
+  @override
+  State<ConversationScreen> createState() => _ConversationScreenState();
+}
+
+class _ConversationScreenState extends State<ConversationScreen> {
+  //final TextEditingController _searchController = TextEditingController();
+  String _searchText = '';
+
+  @override
+  Widget build(context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'FuseChat',
+          style: GoogleFonts.irishGrover(
+            fontSize: 28,
+            color: Colors.white,
+          ),
+        ),
+        leading: IconButton(
+          onPressed: () async {
+            await FirebaseAuth.instance.signOut();
+            print('User signed out');
+            if (context.mounted) {
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(
+                  builder: (context) => const AuthScreen(),
+                ),
+              );
+            }
+          },
+          icon: const Icon(Icons.logout, color: Colors.white,),
+          tooltip: 'Sign Out',
+        ),
+      ),
+      body: Center(
+        child: Column(
+          children: [
+            Padding(
+              padding: EdgeInsets.all(16),
+              child: SearchBar(
+                hintText: 'Search conversations',
+                leading: Icon(Icons.menu, color: Colors.black,),
+                trailing: [Icon(Icons.search, color: Colors.black)],
+                onChanged: (value) {
+                  setState(() {
+                    _searchText = value;
+                  });
+                  debugPrint('Search text: $_searchText');
+                },
+              ),
+            ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: dummyConversations.length,
+                itemBuilder: (context, index) {
+                  final chat = dummyConversations[index];
+                  return Card(
+                    margin: EdgeInsets.all(2),
+                    child: ListTile(
+                      leading: CircleAvatar(
+                        child: Text(
+                          chat.participants[1].name[0].toUpperCase(), 
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold
+                          ), 
+                        ),
+                      ),
+                      title: Text(chat.participants[1].name, style: TextStyle(color: Colors.white),),
+                      subtitle: Text(chat.messages.last.text,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 13,
+                        ),
+                      ),
+                      trailing: Text(chat.messages.last.timestamp.toString(), 
+                      ),
+                      onTap: () {},
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: (){},
+        child: const Icon(Icons.message),
+        )
+    );
+  }
+}
