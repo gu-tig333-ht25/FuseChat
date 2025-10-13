@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../data/dummy_conversation_data.dart';
-import '../auth/auth_screen.dart';
+import 'auth_screen.dart';
 
 class ConversationScreen extends StatefulWidget {
   const ConversationScreen({super.key});
@@ -21,10 +21,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
       appBar: AppBar(
         title: Text(
           'FuseChat',
-          style: GoogleFonts.irishGrover(
-            fontSize: 28,
-            color: Colors.white,
-          ),
+          style: GoogleFonts.irishGrover(fontSize: 28, color: Colors.white),
         ),
         leading: IconButton(
           onPressed: () async {
@@ -32,13 +29,11 @@ class _ConversationScreenState extends State<ConversationScreen> {
             print('User signed out');
             if (context.mounted) {
               Navigator.of(context).pushReplacement(
-                MaterialPageRoute(
-                  builder: (context) => const AuthScreen(),
-                ),
+                MaterialPageRoute(builder: (context) => const AuthScreen()),
               );
             }
           },
-          icon: const Icon(Icons.logout, color: Colors.white,),
+          icon: const Icon(Icons.logout, color: Colors.white),
           tooltip: 'Sign Out',
         ),
       ),
@@ -49,7 +44,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
               padding: EdgeInsets.all(16),
               child: SearchBar(
                 hintText: 'Search conversations',
-                leading: Icon(Icons.menu, color: Colors.black,),
+                leading: Icon(Icons.menu, color: Colors.black),
                 trailing: [Icon(Icons.search, color: Colors.black)],
                 onChanged: (value) {
                   setState(() {
@@ -69,22 +64,21 @@ class _ConversationScreenState extends State<ConversationScreen> {
                     child: ListTile(
                       leading: CircleAvatar(
                         child: Text(
-                          chat.participants[1].name[0].toUpperCase(), 
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold
-                          ), 
+                          chat.participants[1].name[0].toUpperCase(),
+                          style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ),
-                      title: Text(chat.participants[1].name, style: TextStyle(color: Colors.white),),
-                      subtitle: Text(chat.messages.last.text,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 13,
-                        ),
+                      title: Text(
+                        chat.participants[1].name,
+                        style: TextStyle(color: Colors.white),
                       ),
-                      trailing: Text(chat.messages.last.timestamp.toString(), 
+                      subtitle: Text(
+                        chat.messages.last.text,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 13),
                       ),
+                      trailing: Text(chat.messages.last.timestamp.toString()),
                       onTap: () {},
                     ),
                   );
@@ -95,9 +89,9 @@ class _ConversationScreenState extends State<ConversationScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: (){},
+        onPressed: () {},
         child: const Icon(Icons.message),
-        )
+      ),
     );
   }
 }
