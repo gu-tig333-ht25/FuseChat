@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../data/dummy_conversation_data.dart';
+import '../auth/auth_screen.dart';
 
 class ConversationScreen extends StatefulWidget {
   const ConversationScreen({super.key});
@@ -16,10 +19,27 @@ class _ConversationScreenState extends State<ConversationScreen> {
   Widget build(context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Conversations'),
+        title: Text(
+          'FuseChat',
+          style: GoogleFonts.irishGrover(
+            fontSize: 28,
+            color: Colors.white,
+          ),
+        ),
         leading: IconButton(
-          onPressed: () {},
-          icon: const Icon(Icons.account_circle_outlined, color: Colors.white,),
+          onPressed: () async {
+            await FirebaseAuth.instance.signOut();
+            print('User signed out');
+            if (context.mounted) {
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(
+                  builder: (context) => const AuthScreen(),
+                ),
+              );
+            }
+          },
+          icon: const Icon(Icons.logout, color: Colors.white,),
+          tooltip: 'Sign Out',
         ),
       ),
       body: Center(
