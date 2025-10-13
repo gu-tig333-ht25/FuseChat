@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:template/pages/chat_screen.dart';
+import 'package:template/pages/profile_view/profile_view.dart';
 import '../data/dummy_conversation_data.dart';
-import 'auth_screen.dart';
 
 class ConversationScreen extends StatefulWidget {
   const ConversationScreen({super.key});
@@ -24,17 +24,15 @@ class _ConversationScreenState extends State<ConversationScreen> {
           style: GoogleFonts.irishGrover(fontSize: 28, color: Colors.white),
         ),
         leading: IconButton(
-          onPressed: () async {
-            await FirebaseAuth.instance.signOut();
-            print('User signed out');
-            if (context.mounted) {
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (context) => const AuthScreen()),
-              );
-            }
-          },
-          icon: const Icon(Icons.logout, color: Colors.white),
-          tooltip: 'Sign Out',
+          onPressed: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => ProfileView(),
+        ),
+      );
+    },
+    icon: const Icon(Icons.person),
+    tooltip: 'Profile',
         ),
       ),
       body: Center(
@@ -79,7 +77,13 @@ class _ConversationScreenState extends State<ConversationScreen> {
                         style: TextStyle(fontSize: 13),
                       ),
                       trailing: Text(chat.messages.last.timestamp.toString()),
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => ChatScreen(convIndex: index),
+                          ),
+                        );
+                      },
                     ),
                   );
                 },

@@ -8,8 +8,6 @@ import 'services/auth/auth.dart';
 
 import 'pages/auth_screen.dart';
 import 'pages/conversation_screen.dart';
-import 'pages/profile_view/profile_view.dart';
-import 'pages/chat_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,12 +28,18 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [ChangeNotifierProvider(create: (_) => MyAuthProvider())],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        theme: fuseChatDarkTheme,
-        home: const AuthScreen(),
+    return ChangeNotifierProvider(
+      create: (_) => MyAuthProvider(),
+      child: Consumer<MyAuthProvider>(
+        builder: (context, auth, _) {
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            theme: fuseChatDarkTheme,
+            home: auth.isLoggedIn
+                ? const ConversationScreen()
+                : const AuthScreen(),
+          );
+        },
       ),
     );
   }

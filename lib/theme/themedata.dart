@@ -32,7 +32,11 @@ final ThemeData fuseChatDarkTheme = ThemeData(
       color: Colors.white,
     ),
   ),
-
+  searchBarTheme: const SearchBarThemeData(
+    backgroundColor: WidgetStatePropertyAll(Colors.white),
+    textStyle: WidgetStatePropertyAll(TextStyle(color: Colors.black)),
+    hintStyle: WidgetStatePropertyAll(TextStyle(color: Colors.black54)),
+  ),
   // Input fields
   inputDecorationTheme: InputDecorationTheme(
     filled: true,
