@@ -5,15 +5,33 @@ import 'settings_tile.dart';
 class ProfileView extends StatefulWidget {
   @override
   State<ProfileView> createState() => _ProfileViewState();
+}
 
+class _ProfileViewState extends State<ProfileView> {
   String profileName = "Jane Doe";
   String profileEmail = "jane.doe@email.com";
   int totMsgs = 248;
   int groups = 12;
   int aiReplies = 156;
-}
+  late TextEditingController _controller;
 
-class _ProfileViewState extends State<ProfileView> {
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: profileName);
+    _controller.addListener(() {
+      setState(() {
+        profileName = _controller.text;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,9 +44,17 @@ class _ProfileViewState extends State<ProfileView> {
         ),
         centerTitle: true,
         title: Text(
-          "${widget.profileName}'s Profile",
+          "${profileName.trim().isEmpty == false ? profileName : 'User'}'s Profile",
           style: TextStyle(color: Color.fromARGB(255, 204, 208, 211)),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings, color: Colors.white),
+            onPressed: () {
+              // TODO: navigator.push(ProfileSettings)
+            },
+          ),
+        ],
         backgroundColor: Color.fromARGB(255, 18, 18, 21),
       ),
       body: Container(
@@ -48,29 +74,8 @@ class _ProfileViewState extends State<ProfileView> {
                         backgroundImage: AssetImage("assets/jane_doe.png"),
                       ),
                       const SizedBox(height: 20),
-                      SizedBox(
-                        width: 200, // control TextField width
-                        child: TextField(
-                          style: TextStyle(color: Colors.white), // text color
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: Color.fromARGB(255, 31, 32, 35),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(16),
-                              borderSide: BorderSide.none,
-                            ),
-                            hintText: 'Enter new nickname',
-                            hintStyle: TextStyle(color: Colors.grey[400]),
-                            contentPadding: EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 8,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
                       Text(
-                        widget.profileEmail,
+                        profileEmail,
                         style: TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.w100,
@@ -93,7 +98,7 @@ class _ProfileViewState extends State<ProfileView> {
                       child: StatCard(
                         icon: Icons.message_outlined,
                         color: Colors.blue,
-                        value: '${widget.totMsgs}',
+                        value: '$totMsgs',
                         label: 'Messages',
                       ),
                     ),
@@ -102,7 +107,7 @@ class _ProfileViewState extends State<ProfileView> {
                       child: StatCard(
                         icon: Icons.group,
                         color: Colors.purpleAccent,
-                        value: '${widget.groups}',
+                        value: '$groups',
                         label: 'Groups',
                       ),
                     ),
@@ -111,25 +116,21 @@ class _ProfileViewState extends State<ProfileView> {
                       child: StatCard(
                         icon: Icons.stars,
                         color: Colors.orangeAccent,
-                        value: '${widget.aiReplies}',
+                        value: '$aiReplies',
                         label: 'AI Replies',
                       ),
                     ),
                   ],
                 ),
               ),
-              Divider(
-                thickness: 1, // line thickness
-                color: Colors.grey[300], // line color
-                height: 40, // total space around the line
-              ),
+              Divider(thickness: 1, color: Colors.grey[300], height: 40),
 
               Column(
                 children: [
                   SettingsTile(
                     icon: Icons.stars,
                     label: "AI Configuration",
-                    actionText: "Configure",
+                    actionText: "Configure AI",
                     onTap: () {
                       // TODO: navigator.push()
                     },
@@ -146,14 +147,6 @@ class _ProfileViewState extends State<ProfileView> {
                     icon: Icons.lock_outline,
                     label: "Privacy",
                     actionText: "Manage",
-                    onTap: () {
-                      // TODO: navigator.push()
-                    },
-                  ),
-                  SettingsTile(
-                    icon: Icons.help_outline,
-                    label: "Help & Support",
-                    actionText: "Get Help",
                     onTap: () {
                       // TODO: navigator.push()
                     },
