@@ -60,25 +60,24 @@ class _AuthScreenState extends State<AuthScreen> {
         );
         print('Signup successful');
       }
-      
+
       // Navigate to main app
       if (mounted) {
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (context) => const ConversationScreen(),
-          ),
+          MaterialPageRoute(builder: (context) => const ConversationScreen()),
         );
       }
     } on FirebaseAuthException catch (e) {
       print('Auth error: ${e.code}');
       String message = 'An error occurred';
       if (e.code == 'configuration-not-found') {
-        message = 'Firebase Authentication not configured!\n\n'
-                 'Please:\n'
-                 '1. Go to Firebase Console\n'
-                 '2. Enable Authentication\n'
-                 '3. Enable Email/Password provider\n\n'
-                 'Tap the debug button (🐛) for more info.';
+        message =
+            'Firebase Authentication not configured!\n\n'
+            'Please:\n'
+            '1. Go to Firebase Console\n'
+            '2. Enable Authentication\n'
+            '3. Enable Email/Password provider\n\n'
+            'Tap the debug button (🐛) for more info.';
       } else if (e.code == 'user-not-found') {
         message = 'No user found for that email.';
       } else if (e.code == 'wrong-password') {
@@ -94,7 +93,7 @@ class _AuthScreenState extends State<AuthScreen> {
       } else {
         message = 'Authentication failed: ${e.message}';
       }
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -134,7 +133,7 @@ class _AuthScreenState extends State<AuthScreen> {
             child: Column(
               children: [
                 const Spacer(flex: 1),
-                
+
                 // FuseChat logo with bomb icon
                 Column(
                   children: [
@@ -162,9 +161,7 @@ class _AuthScreenState extends State<AuthScreen> {
                     Container(
                       width: 200,
                       height: 200,
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                      ),
+                      decoration: const BoxDecoration(shape: BoxShape.circle),
                       child: Image.asset(
                         'lib/assets/logo.png',
                         width: 200,
@@ -174,19 +171,16 @@ class _AuthScreenState extends State<AuthScreen> {
                     ),
                   ],
                 ),
-                
+
                 const SizedBox(height: 40),
-                
+
                 // Email field
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
                       'Email',
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 16,
-                      ),
+                      style: TextStyle(color: Colors.white70, fontSize: 16),
                     ),
                     const SizedBox(height: 8),
                     TextFormField(
@@ -221,19 +215,16 @@ class _AuthScreenState extends State<AuthScreen> {
                     ),
                   ],
                 ),
-                
+
                 const SizedBox(height: 24),
-                
+
                 // Password field
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
                       'Password',
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 16,
-                      ),
+                      style: TextStyle(color: Colors.white70, fontSize: 16),
                     ),
                     const SizedBox(height: 8),
                     TextFormField(
@@ -264,9 +255,9 @@ class _AuthScreenState extends State<AuthScreen> {
                     ),
                   ],
                 ),
-                
+
                 const SizedBox(height: 32),
-                
+
                 // Login/Sign Up button
                 SizedBox(
                   width: double.infinity,
@@ -286,7 +277,9 @@ class _AuthScreenState extends State<AuthScreen> {
                             height: 20,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Colors.white,
+                              ),
                             ),
                           )
                         : Text(
@@ -298,9 +291,9 @@ class _AuthScreenState extends State<AuthScreen> {
                           ),
                   ),
                 ),
-                
+
                 const SizedBox(height: 16),
-                
+
                 // Toggle between login and signup
                 TextButton(
                   onPressed: () {
@@ -309,7 +302,7 @@ class _AuthScreenState extends State<AuthScreen> {
                     });
                   },
                   child: Text(
-                    _isLogin 
+                    _isLogin
                         ? "Don't have an account? Sign up!"
                         : "Already have an account? Log in!",
                     style: TextStyle(
@@ -318,7 +311,7 @@ class _AuthScreenState extends State<AuthScreen> {
                     ),
                   ),
                 ),
-                
+
                 const Spacer(),
               ],
             ),
