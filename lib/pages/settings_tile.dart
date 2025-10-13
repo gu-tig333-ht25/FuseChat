@@ -21,20 +21,24 @@ class SettingsTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: Icon(icon, color: iconColor ?? Colors.black87, size: 30),
+      leading: Icon(
+        icon,
+        color: iconColor ?? Color.fromARGB(255, 204, 208, 211),
+        size: 30,
+      ),
       title: Text(
         label,
         style: TextStyle(
           fontSize: 20,
           fontWeight: FontWeight.w100,
-          color: textColor ?? Colors.black,
+          color: textColor ?? Color.fromARGB(255, 204, 208, 211),
         ),
       ),
       trailing: actionText.isNotEmpty
           ? Text(
               actionText,
               style: TextStyle(
-                color: Colors.grey[600],
+                color: Color.fromARGB(200, 204, 208, 211),
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
               ),
@@ -42,7 +46,6 @@ class SettingsTile extends StatelessWidget {
           : null,
       onTap: onTap,
       contentPadding: const EdgeInsets.fromLTRB(30, 12, 30, 12),
-      //contentPadding: const EdgeInsets.symmetric(horizontal: 30.0),
       horizontalTitleGap: 12.0,
     );
   }
