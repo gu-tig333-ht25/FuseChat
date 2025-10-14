@@ -9,6 +9,10 @@ import 'pages/conversation_screen.dart';
 import 'pages/profile_view/profile_view.dart';
 import 'pages/chat_screen.dart';
 
+import 'package:provider/provider.dart';
+import 'models/user_model.dart';
+import 'models/AI_model.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -19,8 +23,12 @@ void main() async {
   } catch (e) {
     throw ('Firebase initialization failed: $e');
   }
-
-  runApp(MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => AIPersonalitySettings(),
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

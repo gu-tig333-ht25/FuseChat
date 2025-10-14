@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'stat_card.dart';
 import 'settings_tile.dart';
+import 'AI_config_view.dart';
 
 class ProfileView extends StatefulWidget {
   @override
@@ -132,7 +133,10 @@ class _ProfileViewState extends State<ProfileView> {
                     label: "AI Configuration",
                     actionText: "Configure AI",
                     onTap: () {
-                      // TODO: navigator.push()
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => AIConfig()),
+                      );
                     },
                   ),
                   SettingsTile(
