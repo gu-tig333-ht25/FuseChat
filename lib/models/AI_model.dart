@@ -17,20 +17,30 @@ const List<Personality> defaultPersonalities = [
 
 class AIPersonalitySettings extends ChangeNotifier {
   final List<Personality> _personalities;
-
+  bool _aiSuggestionsEnabled;
   Personality? selectedPersonality;
 
   AIPersonalitySettings({
     List<Personality> personalities = defaultPersonalities,
-  }) : _personalities = personalities;
+    bool aiSuggestionsEnabled = true,
+  }) : _personalities = personalities,
+       _aiSuggestionsEnabled = aiSuggestionsEnabled;
 
-  List<Personality> get personalities =>
-      UnmodifiableListView(_personalities);
+  set aiSuggestionsEnabled(bool enabled) {
+    if (_aiSuggestionsEnabled != enabled) {
+      _aiSuggestionsEnabled = enabled;
+      notifyListeners();
+    }
+  }
+
+  get aiSuggestionsEnabled => _aiSuggestionsEnabled;
+
+  List<Personality> get personalities => UnmodifiableListView(_personalities);
 
   bool isSelected(Personality personality) =>
       personality == selectedPersonality;
 
-  bool selectPersonality(Personality pi){
+  bool selectPersonality(Personality pi) {
     if (!_personalities.contains(pi)) return false;
     selectedPersonality = pi;
     notifyListeners();
