@@ -9,6 +9,17 @@ class MyAuthProvider extends ChangeNotifier {
 
   bool get isLoggedIn => _firebaseAuth.currentUser != null;
 
+  User? _user;
+  User? get user => _user;
+
+  MyAuthProvider() {
+    _firebaseAuth.authStateChanges().listen((user) {
+      _user = user;
+      debugPrint('Auth state changed: $_user');
+      notifyListeners();
+    });
+  }
+
   Future<void> login(String email, String password) async {
     _setLoading(true);
     try {

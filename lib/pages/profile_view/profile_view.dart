@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'stat_card.dart';
 import 'settings_tile.dart';
+import '../../services/auth_service.dart';
+import 'package:provider/provider.dart';
 
 class ProfileView extends StatefulWidget {
   @override
@@ -89,7 +91,7 @@ class _ProfileViewState extends State<ProfileView> {
                   ],
                 ),
                 Divider(thickness: 1, color: Colors.grey[300], height: 40),
-        
+
                 Padding(
                   padding: const EdgeInsets.all(12.0),
                   child: Row(
@@ -125,7 +127,7 @@ class _ProfileViewState extends State<ProfileView> {
                   ),
                 ),
                 Divider(thickness: 1, color: Colors.grey[300], height: 40),
-        
+
                 Column(
                   children: [
                     SettingsTile(
@@ -159,7 +161,7 @@ class _ProfileViewState extends State<ProfileView> {
                       iconColor: Colors.red,
                       textColor: Colors.red,
                       onTap: () {
-                        // TODO: Log out and maybe some push/pop stuff
+                        context.read<MyAuthProvider>().logout();
                       },
                     ),
                   ],

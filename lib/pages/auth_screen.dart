@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../services/auth/auth.dart';
+import '../services/auth_service.dart';
 import 'conversation_screen.dart';
 
 class AuthScreen extends StatefulWidget {
@@ -64,7 +64,6 @@ class _AuthScreenState extends State<AuthScreen> {
           child: Form(
             key: _formKey,
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const Spacer(),
                 Text('FuseChat', style: theme.textTheme.displayLarge),
@@ -96,20 +95,25 @@ class _AuthScreenState extends State<AuthScreen> {
                   },
                 ),
                 const SizedBox(height: 32),
-
                 Consumer<MyAuthProvider>(
                   builder: (context, auth, child) {
-                    return ElevatedButton(
-                      onPressed: auth.isLoading
-                          ? null
-                          : () => _authenticate(auth),
-                      child: auth.isLoading
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : Text(_isLogin ? 'Log in' : 'Sign Up'),
+                    return SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton(
+                        onPressed: auth.isLoading
+                            ? null
+                            : () => _authenticate(auth),
+                        child: auth.isLoading
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : Text(_isLogin ? 'Log in' : 'Sign Up'),
+                      ),
                     );
                   },
                 ),

@@ -58,9 +58,7 @@ final ThemeData fuseChatDarkTheme = ThemeData(
     style: ElevatedButton.styleFrom(
       backgroundColor: const Color(0xFF3A3A3A),
       foregroundColor: Colors.white,
-      padding: const EdgeInsets.symmetric(
-        vertical: 20,
-      ), // ⬆️ Taller button height
+      padding: const EdgeInsets.symmetric(vertical: 20),
       textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
     ),
