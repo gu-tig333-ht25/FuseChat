@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:template/pages/chat_screen.dart';
+import 'package:template/pages/profile_view/profile_view.dart';
 import '../data/dummy_conversation_data.dart';
 
 class ConversationScreen extends StatefulWidget {
@@ -16,10 +19,20 @@ class _ConversationScreenState extends State<ConversationScreen> {
   Widget build(context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Conversations'),
+        title: Text(
+          'FuseChat',
+          style: GoogleFonts.irishGrover(fontSize: 28, color: Colors.white),
+        ),
         leading: IconButton(
-          onPressed: () {},
-          icon: const Icon(Icons.account_circle_outlined, color: Colors.white,),
+          onPressed: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => ProfileView(),
+        ),
+      );
+    },
+    icon: const Icon(Icons.person),
+    tooltip: 'Profile',
         ),
       ),
       body: Center(
@@ -29,7 +42,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
               padding: EdgeInsets.all(16),
               child: SearchBar(
                 hintText: 'Search conversations',
-                leading: Icon(Icons.menu, color: Colors.black,),
+                leading: Icon(Icons.menu, color: Colors.black),
                 trailing: [Icon(Icons.search, color: Colors.black)],
                 onChanged: (value) {
                   setState(() {
@@ -49,23 +62,28 @@ class _ConversationScreenState extends State<ConversationScreen> {
                     child: ListTile(
                       leading: CircleAvatar(
                         child: Text(
-                          chat.participants[1].name[0].toUpperCase(), 
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold
-                          ), 
+                          chat.participants[1].name[0].toUpperCase(),
+                          style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ),
-                      title: Text(chat.participants[1].name, style: TextStyle(color: Colors.white),),
-                      subtitle: Text(chat.messages.last.text,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 13,
-                        ),
+                      title: Text(
+                        chat.participants[1].name,
+                        style: TextStyle(color: Colors.white),
                       ),
-                      trailing: Text(chat.messages.last.timestamp.toString(), 
+                      subtitle: Text(
+                        chat.messages.last.text,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 13),
                       ),
-                      onTap: () {},
+                      trailing: Text(chat.messages.last.timestamp.toString()),
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => ChatScreen(convIndex: index),
+                          ),
+                        );
+                      },
                     ),
                   );
                 },
@@ -75,9 +93,9 @@ class _ConversationScreenState extends State<ConversationScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: (){},
+        onPressed: () {},
         child: const Icon(Icons.message),
-        )
+      ),
     );
   }
 }
