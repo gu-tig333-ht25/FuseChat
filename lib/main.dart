@@ -7,8 +7,6 @@ import 'theme/themedata.dart';
 import 'services/auth_service.dart';
 import 'services/auth_wrapper.dart';
 
-import 'package:provider/provider.dart';
-import 'models/user_model.dart';
 import 'models/AI_model.dart';
 
 void main() async {
@@ -23,7 +21,7 @@ void main() async {
   }
   runApp(
     ChangeNotifierProvider(
-      create: (_) => AIPersonalitySettings(),
+      create: (_) => AISettings(),
       child: MyApp(),
     ),
   );

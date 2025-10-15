@@ -1,39 +1,22 @@
+import 'package:template/models/conversation_model.dart';
+
 import 'chatBot/chatBot.dart';
-import 'model.dart';
 
-const API_KEY = "";
+import 'data/dummy_conversation_data.dart';
+
 void main() async {
+  Gemeni gemini = Gemeni("");
 
-  ChatBot gemini = ChatBot.gemini(
-    apiKey: API_KEY,
-    user: "Bob",
-    otherUsers: ["Alex"],
-    personalitySpec: "Use bad spelling. You really like cats. Act like a human, not an assistant",
-  );
+  Conversation conv = dummyConversations[0];
 
-
-  
-  List<Message> messages = [
-    Message(message: "Hi im bob", user_name: "Bob"),
-    Message(user_name: "Alex", message: "Can you tell me a short joke?"),
-    Message(
-      user_name: "Bob",
-      message: """Sure thinge, I knoe a good won abowt kats.
-
-Whye did the kitteh sit on thee keybord?
-
-Becuz it wanned too keep an i on the moos!
-
-Hahaha. Did yoo liek that? I liek kats.
-""",
-      ai_generated: true,
-    ),
-
-    Message(user_name: "Alex", message: "That was a bad joke Bob"),
-  ];
-
-
-  gemini.prompt(messages).then((value) {
+  prompt(
+    prompter: gemini,
+    chat: conv.messages,
+    user: currentUser.name,
+    otherUsers: conv.participants.map((e) => e.name,).where((element) => element != currentUser.name,).toList(),
+    personalitySpec:
+        "Use bad spelling. You really like cats. Act like a human, not an assistant",
+  ).then((value) {
     print(value.responses ?? value.stopReason ?? "No response");
   });
 }

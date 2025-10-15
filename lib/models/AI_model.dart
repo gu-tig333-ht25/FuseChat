@@ -2,6 +2,8 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
 import 'dart:collection';
 
+import 'package:template/chatBot/chatBot.dart';
+
 const List<Personality> defaultPersonalities = [
   Personality(
     name: "Serious",
@@ -15,12 +17,13 @@ const List<Personality> defaultPersonalities = [
   ),
 ];
 
-class AIPersonalitySettings extends ChangeNotifier {
+class AISettings extends ChangeNotifier {
   final List<Personality> _personalities;
   bool _aiSuggestionsEnabled;
   Personality? selectedPersonality;
+  String? _api_key;
 
-  AIPersonalitySettings({
+  AISettings({
     List<Personality> personalities = defaultPersonalities,
     bool aiSuggestionsEnabled = true,
   }) : _personalities = personalities,
@@ -61,7 +64,22 @@ class AIPersonalitySettings extends ChangeNotifier {
     notifyListeners();
     return true;
   }
+
+  String? get api_key => _api_key;
+  Promptable? _promptable;
+
+  set api_key(String apiKey){
+    _promptable = Gemeni(apiKey);
+    _api_key = apiKey;
+    notifyListeners();
+  }
+
+  Promptable? get promptable => _promptable;
 }
+
+
+
+
 
 class Personality {
   final String name;

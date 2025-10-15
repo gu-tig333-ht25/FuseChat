@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-import 'AI_model.dart';
 
 class User {
   final String id;

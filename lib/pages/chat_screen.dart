@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:template/chatBot/chatBot.dart';
+import 'package:template/models/AI_model.dart';
 import 'package:template/models/conversation_model.dart';
 //import 'package:firebase_auth/firebase_auth.dart';
 //import 'package:cloud_firestore/cloud_firestore.dart';
@@ -23,6 +26,8 @@ class ChatScreen extends StatefulWidget {
   State<ChatScreen> createState() => _ChatScreenState();
 }
 
+
+
 class _ChatScreenState extends State<ChatScreen> {
   final messageTextController = TextEditingController();
 
@@ -42,10 +47,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   vertical: 8.0,
                   horizontal: 16.0,
                 ),
-                child: Text(
-                  'LLM Suggestions Here. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin eu quam nisl. Suspendisse potenti. Maecenas.',
-                  style: TextStyle(color: Colors.grey[100]),
-                ), // 2do: Implement LLM suggestions
+                child: AISuggestionBox(conv: dummyConversations[widget.convIndex]),
               ),
             ),
             Row(
@@ -68,7 +70,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           conv.messages.add(
                             Message(
                               id: 'm${conv.messages.length + 1}',
-                              senderId: currentUser.id,
+                              sender: currentUser,
                               text: messageTextController.text,
                               timestamp: DateTime.now(),
                             ),
@@ -102,9 +104,9 @@ class DummyMessagesStream extends StatelessWidget {
       itemBuilder: (context, index) {
         final msg = dummyConversations[convIndex].messages[index];
         return MessageBubble(
-          sender: msg.senderId,
+          sender: msg.sender.id,
           text: msg.text,
-          isMe: msg.senderId == currentUser.id,
+          isMe: msg.sender.id == currentUser.id,
         );
       },
     );
@@ -196,6 +198,66 @@ class MessageBubble extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class AISuggestionBox extends StatelessWidget {
+  final Conversation conv;
+  AISuggestionBox({required this.conv, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    AISettings settings = context.watch<AISettings>();
+    Promptable? promptable = settings.promptable;
+    if (promptable == null) {
+      String reasonText;
+      if (settings.api_key == null) {
+        reasonText = "API key has net been given";
+      } else if (~settings.aiSuggestionsEnabled) {
+        reasonText = "AI suggestions are disabled";
+      } else {
+        reasonText = "ChatBot error, perhaps wrong API key?";
+      }
+      return Text(reasonText);
+    }
+
+    Personality? personality = settings.selectedPersonality;
+    if (personality == null) {
+      return Text("Personality has not been selected");
+    }
+
+    return FutureBuilder(
+      future: prompt(
+        prompter: promptable,
+        chat: conv.messages,
+        user: currentUser.name,
+        otherUsers: conv.participants
+            .map((e) => e.name)
+            .where((element) => element != currentUser.name)
+            .toList(),
+        personalitySpec: personality.instruction,
+      ),
+      builder: (context, snapshot) {
+        PromptResponse? promptResponse = snapshot.data;
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const CircularProgressIndicator();
+        } else if (snapshot.connectionState == ConnectionState.done) {
+          if (snapshot.hasError) {
+            return Text("❌ Error: ${snapshot.error}");
+          } else if (snapshot.hasData && promptResponse != null) {
+            return SelectableText(
+              promptResponse.responses ??
+                  promptResponse.stopReason ??
+                  "Empty ChatBot Response",
+            );
+          } else {
+            return const Text("⚠️ No data returned");
+          }
+        } else {
+          return const Text("Idle");
+        }
+      },
     );
   }
 }

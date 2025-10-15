@@ -1,5 +1,5 @@
 import 'package:flutter_gemini/flutter_gemini.dart';
-import '../model.dart';
+import '../models/message_model.dart';
 
 enum Role { user, model }
 
@@ -19,10 +19,14 @@ String basicBaseSystemPrompt(
   String Function(String userName, String message) formatUserMessage,
 ) {
   return """You are $user, and are in a conversation with ${otherUsers.join(", ")}.
-  If you see:
-    ${formatUserMessage(otherUsers[0], "How are you $user")}
-  Then you should give an answer based on the message and previous messages.
-
+If you see:
+  ${formatUserMessage(otherUsers[0], "How are you $user")}
+Then you should give an answer based on the message and previous messages.
+Like this:
+  Good
+Not like this:
+  ${formatUserMessage(user, "Good")}
+Always give a text answer as if you are sending another message.
   """;
 }
 
@@ -32,74 +36,54 @@ class PromptResponse {
   PromptResponse(this.responses, this.stopReason);
 }
 
-abstract class Proptable {
-  Future<PromptResponse> prompt(
-    List<ChatBotMessage> chat,
-    String system_prompt,
-  );
+abstract class Promptable {
+  Future<PromptResponse> prompt(List<ChatBotMessage> chat, String systemPrompt);
 }
 
-class ChatBot {
-  final String Function(
-    String user,
-    List<String> otherUsers,
-    String Function(String userName, String message),
-  )
-  baseSystemPrompt;
-  final String Function(String userName, String message) formatUserMessage;
-  String personalitySpec;
-  final List<String> otherUsers;
-  final String user;
-  final Proptable prompter;
+Future<PromptResponse> prompt({
+  required Promptable prompter,
+  required List<Message> chat,
+  required String user,
+  required List<String> otherUsers,
+  required String personalitySpec,
+  String Function(
+        String user,
+        List<String> otherUsers,
+        String Function(String userName, String message),
+      )
+      baseSystemPrompt =
+      basicBaseSystemPrompt,
+  String Function(String userName, String message) formatUserMessage =
+      bracketFormat,
+}) {
+  String systemPrompt =
+      baseSystemPrompt(user, otherUsers, formatUserMessage) + personalitySpec;
+  List<ChatBotMessage> chatBotMessages = [];
+  String userMessage = "";
 
-  ChatBot({
-    required this.prompter,
-    required this.personalitySpec,
-    required this.user,
-    required this.otherUsers,
-    this.formatUserMessage = bracketFormat,
-    this.baseSystemPrompt = basicBaseSystemPrompt,
-  });
-
-  ChatBot.gemini({
-    required String apiKey,
-    required this.personalitySpec,
-    required this.user,
-    required this.otherUsers,
-    this.formatUserMessage = bracketFormat,
-    this.baseSystemPrompt = basicBaseSystemPrompt,
-  }) : this.prompter = GemeniPromparble(apiKey);
-
-  Future<PromptResponse> prompt(List<Message> chat) {
-    String systemPrompt =
-        baseSystemPrompt(user, otherUsers, formatUserMessage) + personalitySpec;
-    List<ChatBotMessage> chatBotMessages = [];
-    String userMessage = "";
-
-    chat.forEach((m) {
-      if (m.ai_generated && m.user_name == user) {
-        if (userMessage != "") {
-          chatBotMessages.add(ChatBotMessage(Role.user, userMessage));
-        }
-        chatBotMessages.add(ChatBotMessage(Role.model, m.message));
-        userMessage = "";
-      } else {
-        userMessage =
-            """$userMessage
-        ${formatUserMessage(m.user_name, m.message)}
-        """;
-      }
-    });
-    if (userMessage != "") {
+  for (var m in chat) {
+    if (m.ai_generated && m.sender.name == user) {
+      if (userMessage != "") {
         chatBotMessages.add(ChatBotMessage(Role.user, userMessage));
+      }
+      chatBotMessages.add(ChatBotMessage(Role.model, m.text));
+      userMessage = "";
+    } else {
+      userMessage =
+          """$userMessage
+        ${formatUserMessage(m.sender.name, m.text)}
+        """;
     }
-
-    return prompter.prompt(chatBotMessages, systemPrompt);
   }
+  if (userMessage != "") {
+    chatBotMessages.add(ChatBotMessage(Role.user, userMessage));
+  }
+
+  return prompter.prompt(chatBotMessages, systemPrompt);
 }
 
-class GemeniPromparble implements Proptable {
-  GemeniPromparble(String apiKey) : super() {
+class Gemeni implements Promptable {
+  Gemeni(String apiKey) : super() {
     Gemini.init(apiKey: apiKey);
   }
 
@@ -108,21 +92,18 @@ class GemeniPromparble implements Proptable {
     List<ChatBotMessage> chat,
     String systemPrompt,
   ) async {
+    List<Content> contentChat = chat
+        .map((m) => Content(role: m.role.name, parts: [Part.text(m.message)]))
+        .toList();
     Candidates? candidates = await Gemini.instance.chat(
-      chat
-          .map((m) => Content(role: m.role.name, parts: [Part.text(m.message)]))
-          .toList(),
+      contentChat,
       generationConfig: GenerationConfig(
-        maxOutputTokens: 500,
+        maxOutputTokens: 5000,
         temperature: 0.9,
       ),
       systemPrompt: systemPrompt,
     );
-    if (candidates?.output == null) {
-      return PromptResponse(null, "Gemeni prompt process failed");
-    }
-    return PromptResponse(candidates?.output, null);
+    
+    return PromptResponse(candidates?.output, candidates?.finishReason);
   }
 }
-
-

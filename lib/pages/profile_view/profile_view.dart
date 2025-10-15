@@ -6,6 +6,8 @@ import 'package:provider/provider.dart';
 import 'AI_config_view.dart';
 
 class ProfileView extends StatefulWidget {
+  const ProfileView({super.key});
+
   @override
   State<ProfileView> createState() => _ProfileViewState();
 }
