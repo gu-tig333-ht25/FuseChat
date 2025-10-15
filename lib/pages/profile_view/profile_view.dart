@@ -136,7 +136,10 @@ class _ProfileViewState extends State<ProfileView> {
                       label: "AI Configuration",
                       actionText: "Configure AI",
                       onTap: () {
-                        // TODO: navigator.push()
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => AIConfig()),
+                        );
                       },
                     ),
                     SettingsTile(
@@ -169,48 +172,6 @@ class _ProfileViewState extends State<ProfileView> {
                 ),
               ],
             ),
-              Column(
-                children: [
-                  SettingsTile(
-                    icon: Icons.stars,
-                    label: "AI Configuration",
-                    actionText: "Configure AI",
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => AIConfig()),
-                      );
-                    },
-                  ),
-                  SettingsTile(
-                    icon: Icons.notifications_none,
-                    label: "Notifications",
-                    actionText: "View",
-                    onTap: () {
-                      // TODO: navigator.push()
-                    },
-                  ),
-                  SettingsTile(
-                    icon: Icons.lock_outline,
-                    label: "Privacy",
-                    actionText: "Manage",
-                    onTap: () {
-                      // TODO: navigator.push()
-                    },
-                  ),
-                  SettingsTile(
-                    icon: Icons.logout,
-                    label: "Logout",
-                    actionText: "",
-                    iconColor: Colors.red,
-                    textColor: Colors.red,
-                    onTap: () {
-                      // TODO: Log out and maybe some push/pop stuff
-                    },
-                  ),
-                ],
-              ),
-            ],
           ),
         ),
       ),
