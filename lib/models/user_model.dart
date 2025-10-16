@@ -13,8 +13,7 @@ class User {
     this.imageUrl = '',
   });
 
-  // Create from Firestore document
-  User.fromFirestore(DocumentSnapshot doc) {
+  factory User.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
     
     return User(

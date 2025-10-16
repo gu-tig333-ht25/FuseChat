@@ -1,62 +1,45 @@
-import 'user_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Message {
   final String id;
   final String senderId;
-   final String senderName;
+  final String? senderName;
   final String text;
-  final DateTime timestamp;
-  final bool ai_generated;
+  final DateTime? timestamp;
   final bool isRead;
+  final bool aiGenerated;
 
-  const Message({
+  Message({
     required this.id,
     required this.senderId,
-    required this.senderName,
+    this.senderName,
     required this.text,
-    required this.timestamp,
-    this.ai_generated = false,
-    this.isRead = false,
+    this.timestamp,
+    required this.isRead,
+    this.aiGenerated = false,
   });
 
-  // Create from Firestore document
   factory Message.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
-    
     return Message(
       id: doc.id,
       senderId: data['senderId'] ?? '',
+      senderName: data['senderName'],
       text: data['text'] ?? '',
-      timestamp: (data['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now(),
-      isRead: data['isRead'] ?? false, senderName: data["senderName"],
+      timestamp: (data['timestamp'] as Timestamp?)?.toDate(),
+      isRead: data['isRead'] ?? false,
+      aiGenerated: data['aiGenerated'] ?? false,
     );
   }
 
-  // Convert to Firestore document
-  Map<String, dynamic> toFirestore() {
+  Map<String, dynamic> toMap() {
     return {
       'senderId': senderId,
+      'senderName': senderName,
       'text': text,
-      'timestamp': Timestamp.fromDate(timestamp),
+      'timestamp': timestamp != null ? Timestamp.fromDate(timestamp!) : FieldValue.serverTimestamp(),
       'isRead': isRead,
+      'aiGenerated': aiGenerated,
     };
-  }
-
-  // Create a copy with updated fields
-  Message copyWith({
-    String? id,
-    String? senderId,
-    String? text,
-    DateTime? timestamp,
-    bool? isRead,
-  }) {
-    return Message(
-      id: id ?? this.id,
-      senderId: senderId ?? this.senderId,
-      text: text ?? this.text,
-      timestamp: timestamp ?? this.timestamp,
-      isRead: isRead ?? this.isRead,
-    );
   }
 }

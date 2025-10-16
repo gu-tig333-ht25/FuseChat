@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import 'stat_card.dart';
 import 'settings_tile.dart';
 import '../../services/auth_service.dart';
-import 'package:provider/provider.dart';
 import 'AI_config_view.dart';
 
 class ProfileView extends StatefulWidget {

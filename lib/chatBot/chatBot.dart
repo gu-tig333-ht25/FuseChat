@@ -20,7 +20,7 @@ String basicBaseSystemPrompt(
 ) {
   return """You are $user, and are in a conversation with ${otherUsers.join(", ")}.
 If you see:
-  ${formatUserMessage(otherUsers[0], "How are you $user")}
+  ${formatUserMessage(otherUsers.isNotEmpty ? otherUsers[0] : "User", "How are you $user")}
 Then you should give an answer based on the message and previous messages.
 Like this:
   Good
@@ -51,10 +51,8 @@ Future<PromptResponse> prompt({
         List<String> otherUsers,
         String Function(String userName, String message),
       )
-      baseSystemPrompt =
-      basicBaseSystemPrompt,
-  String Function(String userName, String message) formatUserMessage =
-      bracketFormat,
+      baseSystemPrompt = basicBaseSystemPrompt,
+  String Function(String userName, String message) formatUserMessage = bracketFormat,
 }) {
   String systemPrompt =
       baseSystemPrompt(user, otherUsers, formatUserMessage) + personalitySpec;
@@ -62,19 +60,21 @@ Future<PromptResponse> prompt({
   String userMessage = "";
 
   for (var m in chat) {
-    if (m.ai_generated && m.sender.name == user) {
+    final messageSender = m.senderName ?? m.senderId;
+    
+    if (m.aiGenerated && messageSender == user) {
       if (userMessage != "") {
         chatBotMessages.add(ChatBotMessage(Role.user, userMessage));
       }
       chatBotMessages.add(ChatBotMessage(Role.model, m.text));
       userMessage = "";
     } else {
-      userMessage =
-          """$userMessage
-        ${formatUserMessage(m.sender.name, m.text)}
-        """;
+      userMessage = """$userMessage
+${formatUserMessage(messageSender, m.text)}
+""";
     }
   }
+  
   if (userMessage != "") {
     chatBotMessages.add(ChatBotMessage(Role.user, userMessage));
   }
@@ -95,6 +95,7 @@ class Gemeni implements Promptable {
     List<Content> contentChat = chat
         .map((m) => Content(role: m.role.name, parts: [Part.text(m.message)]))
         .toList();
+    
     Candidates? candidates = await Gemini.instance.chat(
       contentChat,
       generationConfig: GenerationConfig(
