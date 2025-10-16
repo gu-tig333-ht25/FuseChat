@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'auth_service.dart';
 import 'package:provider/provider.dart';
-
+import 'auth_service.dart';
 import '../pages/auth_screen.dart';
 import '../pages/conversation_screen.dart';
 
-// makes sure that the user is brought to the login screen whenever/wherever the user is logged out.
 class AuthWrapper extends StatelessWidget {
   const AuthWrapper({super.key});
 
@@ -14,7 +12,9 @@ class AuthWrapper extends StatelessWidget {
     final auth = context.watch<MyAuthProvider>();
 
     if (auth.user == null && auth.isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
     }
 
     // ConversationScreen is the "default" page that is navigated to after a user is logged in.
@@ -22,7 +22,12 @@ class AuthWrapper extends StatelessWidget {
     if (auth.isLoggedIn) {
       return const ConversationScreen();
     } else {
-      Navigator.popUntil(context, ModalRoute.withName("/"));
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (Navigator.of(context).canPop()) {
+          Navigator.of(context).popUntil((route) => route.isFirst);
+        }
+      });
+      
       return const AuthScreen();
     }
   }

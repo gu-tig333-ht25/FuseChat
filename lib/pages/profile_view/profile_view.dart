@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
 import 'stat_card.dart';
 import 'settings_tile.dart';
 import '../../services/auth_service.dart';
@@ -29,6 +31,13 @@ class _ProfileViewState extends State<ProfileView> {
         profileName = _controller.text;
       });
     });
+    
+    // Load Firebase Auth user info
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser != null) {
+      profileEmail = currentUser.email ?? profileEmail;
+      profileName = currentUser.displayName ?? profileName;
+    }
   }
 
   @override

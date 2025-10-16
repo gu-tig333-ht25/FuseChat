@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:template/pages/chat_screen.dart';
-import 'package:template/pages/profile_view/profile_view.dart';
-import '../data/dummy_conversation_data.dart';
+import 'package:firebase_auth/firebase_auth.dart' as auth;
+import 'package:provider/provider.dart';
+import '../services/firestore_service.dart';
+import '../models/conversation_model.dart';
+import 'chat_screen.dart';
+import 'profile_view/profile_view.dart';
 
 class ConversationScreen extends StatefulWidget {
   const ConversationScreen({super.key});
@@ -12,11 +15,13 @@ class ConversationScreen extends StatefulWidget {
 }
 
 class _ConversationScreenState extends State<ConversationScreen> {
-  //final TextEditingController _searchController = TextEditingController();
   String _searchText = '';
 
   @override
   Widget build(context) {
+    final currentUserId = auth.FirebaseAuth.instance.currentUser?.uid ?? '';
+    final firestoreService = Provider.of<FirestoreService>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -26,13 +31,11 @@ class _ConversationScreenState extends State<ConversationScreen> {
         leading: IconButton(
           onPressed: () {
             Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => ProfileView(),
-        ),
-      );
-    },
-    icon: const Icon(Icons.person),
-    tooltip: 'Profile',
+              MaterialPageRoute(builder: (context) => ProfileView()),
+            );
+          },
+          icon: const Icon(Icons.person),
+          tooltip: 'Profile',
         ),
       ),
       body: Center(
@@ -48,43 +51,68 @@ class _ConversationScreenState extends State<ConversationScreen> {
                   setState(() {
                     _searchText = value;
                   });
-                  debugPrint('Search text: $_searchText');
                 },
               ),
             ),
             Expanded(
-              child: ListView.builder(
-                itemCount: dummyConversations.length,
-                itemBuilder: (context, index) {
-                  final chat = dummyConversations[index];
-                  return Card(
-                    margin: EdgeInsets.all(2),
-                    child: ListTile(
-                      leading: CircleAvatar(
-                        child: Text(
-                          chat.participants[1].name[0].toUpperCase(),
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      title: Text(
-                        chat.participants[1].name,
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      subtitle: Text(
-                        chat.messages.last.text,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(fontSize: 13),
-                      ),
-                      trailing: Text(chat.messages.last.timestamp.toString()),
-                      onTap: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => ChatScreen(convIndex: index),
+              child: StreamBuilder<List<Conversation>>(
+                stream: firestoreService.getConversations(currentUserId),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Center(
+                      child: Text('No conversations yet'),
+                    );
+                  }
+
+                  final conversations = snapshot.data!;
+
+                  return ListView.builder(
+                    itemCount: conversations.length,
+                    itemBuilder: (context, index) {
+                      final conv = conversations[index];
+                      return Card(
+                        margin: EdgeInsets.all(2),
+                        child: ListTile(
+                          leading: CircleAvatar(
+                            child: Text(
+                              conv.name.isNotEmpty 
+                                ? conv.name[0].toUpperCase()
+                                : 'C',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
                           ),
-                        );
-                      },
-                    ),
+                          title: Text(
+                            conv.name,
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          subtitle: Text(
+                            conv.lastMessage,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(fontSize: 13),
+                          ),
+                          trailing: conv.lastMessageTime != null
+                              ? Text(
+                                  '${conv.lastMessageTime!.hour}:${conv.lastMessageTime!.minute.toString().padLeft(2, '0')}',
+                                )
+                              : null,
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => ChatScreen(
+                                  conversationId: conv.id,
+                                  chatTitle: conv.name,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      );
+                    },
                   );
                 },
               ),

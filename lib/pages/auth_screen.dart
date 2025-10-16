@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import '../services/auth_service.dart';
-import 'conversation_screen.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -34,11 +32,8 @@ class _AuthScreenState extends State<AuthScreen> {
         await auth.signup(_emailController.text, _passwordController.text);
       }
 
-      if (mounted) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const ConversationScreen()),
-        );
-      }
+      // AuthWrapper will automatically navigate to ConversationScreen
+      // No need to manually navigate here
     } catch (error) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -54,7 +49,6 @@ class _AuthScreenState extends State<AuthScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    //final auth = Provider.of<MyAuthProvider>(context, listen: true);
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -75,6 +69,8 @@ class _AuthScreenState extends State<AuthScreen> {
                 TextFormField(
                   controller: _emailController,
                   decoration: const InputDecoration(hintText: 'user@mail.com'),
+                  keyboardType: TextInputType.emailAddress,
+                  autocorrect: false,
                   validator: (value) {
                     if (value == null || value.isEmpty) return 'Enter email';
                     if (!value.contains('@')) return 'Invalid email';
@@ -95,6 +91,7 @@ class _AuthScreenState extends State<AuthScreen> {
                   },
                 ),
                 const SizedBox(height: 32),
+                
                 Consumer<MyAuthProvider>(
                   builder: (context, auth, child) {
                     return SizedBox(
