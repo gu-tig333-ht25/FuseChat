@@ -29,7 +29,7 @@ class Message {
       senderId: data['senderId'] ?? '',
       text: data['text'] ?? '',
       timestamp: (data['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now(),
-      isRead: data['isRead'] ?? false,
+      isRead: data['isRead'] ?? false, senderName: data["senderName"],
     );
   }
 
