@@ -92,7 +92,7 @@ class FirestoreInitializer {
           ),
         });
 
-        // Add messages as subcollection
+        // Add messages as subcollection with aiGenerated field
         for (var msg in messages) {
           await convRef.collection('messages').add({
             'senderId': msg['senderId'],
@@ -102,6 +102,7 @@ class FirestoreInitializer {
               DateTime.now().subtract(Duration(minutes: msg['minutesAgo'] as int)),
             ),
             'isRead': true,
+            'aiGenerated': false,  // Added for AI integration
           });
         }
 
