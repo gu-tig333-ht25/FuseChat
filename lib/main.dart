@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'theme/themedata.dart';
 import 'services/auth_service.dart';
 import 'services/auth_wrapper.dart';
+import 'services/firestore_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,8 +27,11 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => MyAuthProvider(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => MyAuthProvider()),
+        Provider<FirestoreService>(create: (_) => FirestoreService()),
+      ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         theme: fuseChatDarkTheme,

@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:template/models/conversation_model.dart';
-//import 'package:firebase_auth/firebase_auth.dart';
-//import 'package:cloud_firestore/cloud_firestore.dart';
-import '../data/dummy_conversation_data.dart';
+import 'package:firebase_auth/firebase_auth.dart' as auth;
+import 'package:provider/provider.dart';
+import '../services/firestore_service.dart';
 import '../models/message_model.dart';
 
 // 2do
@@ -15,9 +14,14 @@ import '../models/message_model.dart';
 // auto focus to text field https://docs.flutter.dev/cookbook/forms/focus
 
 class ChatScreen extends StatefulWidget {
-  const ChatScreen({super.key, required this.convIndex});
+  const ChatScreen({
+    super.key,
+    required this.conversationId,
+    required this.chatTitle,
+  });
 
-  final int convIndex; // Index of the conversation to display
+  final String conversationId;
+  final String chatTitle;
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
@@ -28,12 +32,19 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(context) {
+    final currentUserId = auth.FirebaseAuth.instance.currentUser?.uid ?? '';
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Chat Title')),
+      appBar: AppBar(title: Text(widget.chatTitle)),
       body: SafeArea(
         child: Column(
           children: <Widget>[
-            Expanded(child: DummyMessagesStream(convIndex: widget.convIndex)),
+            Expanded(
+              child: MessagesStream(
+                conversationId: widget.conversationId,
+                currentUserId: currentUserId,
+              ),
+            ),
             Card(
               color: Color(0xFF303030),
               margin: const EdgeInsets.all(8.0),
@@ -43,9 +54,9 @@ class _ChatScreenState extends State<ChatScreen> {
                   horizontal: 16.0,
                 ),
                 child: Text(
-                  'LLM Suggestions Here. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin eu quam nisl. Suspendisse potenti. Maecenas.',
+                  'LLM Suggestions Here...',
                   style: TextStyle(color: Colors.grey[100]),
-                ), // 2do: Implement LLM suggestions
+                ),
               ),
             ),
             Row(
@@ -60,20 +71,18 @@ class _ChatScreenState extends State<ChatScreen> {
                       decoration: const InputDecoration(
                         hintText: 'Type a message...',
                       ),
-                      onSubmitted: (String text) {
-                        setState(() {
-                          // 2do: Implement Firebase send functionality
-                          Conversation conv =
-                              dummyConversations[widget.convIndex];
-                          conv.messages.add(
-                            Message(
-                              id: 'm${conv.messages.length + 1}',
-                              senderId: currentUser.id,
-                              text: messageTextController.text,
-                              timestamp: DateTime.now(),
-                            ),
-                          );
-                        });
+                      onSubmitted: (String text) async {
+                        if (text.trim().isEmpty) return;
+
+                        final firestoreService =
+                            Provider.of<FirestoreService>(context, listen: false);
+
+                        await firestoreService.sendMessage(
+                          conversationId: widget.conversationId,
+                          senderId: currentUserId,
+                          text: text,
+                        );
+
                         messageTextController.clear();
                       },
                     ),
@@ -88,36 +97,56 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 }
 
-class DummyMessagesStream extends StatelessWidget {
-  DummyMessagesStream({super.key, required this.convIndex});
+class MessagesStream extends StatelessWidget {
+  const MessagesStream({
+    super.key,
+    required this.conversationId,
+    required this.currentUserId,
+  });
 
-  final int convIndex;
-  final ScrollController listScrollController = ScrollController();
+  final String conversationId;
+  final String currentUserId;
 
   @override
   Widget build(BuildContext context) {
-    var listView = ListView.builder(
-      controller: listScrollController,
-      itemCount: dummyConversations[convIndex].messages.length,
-      itemBuilder: (context, index) {
-        final msg = dummyConversations[convIndex].messages[index];
-        return MessageBubble(
-          sender: msg.senderId,
-          text: msg.text,
-          isMe: msg.senderId == currentUser.id,
+    final firestoreService = Provider.of<FirestoreService>(context);
+    final ScrollController listScrollController = ScrollController();
+
+    return StreamBuilder<List<Message>>(
+      stream: firestoreService.getMessages(conversationId),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return const Center(child: Text('No messages yet'));
+        }
+
+        final messages = snapshot.data!;
+
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (listScrollController.hasClients) {
+            listScrollController.jumpTo(
+              listScrollController.position.maxScrollExtent,
+            );
+          }
+        });
+
+        return ListView.builder(
+          controller: listScrollController,
+          itemCount: messages.length,
+          itemBuilder: (context, index) {
+            final msg = messages[index];
+            return MessageBubble(
+              sender: msg.senderId,
+              text: msg.text,
+              isMe: msg.senderId == currentUserId,
+            );
+          },
         );
       },
     );
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (listScrollController.hasClients) {
-        listScrollController.jumpTo(
-          listScrollController.position.maxScrollExtent,
-        );
-      }
-    });
-
-    return listView;
   }
 }
 
