@@ -4,8 +4,11 @@ import 'package:provider/provider.dart';
 import 'stat_card.dart';
 import 'settings_tile.dart';
 import '../../services/auth_service.dart';
+import 'AI_config_view.dart';
 
 class ProfileView extends StatefulWidget {
+  const ProfileView({super.key});
+
   @override
   State<ProfileView> createState() => _ProfileViewState();
 }
@@ -143,7 +146,10 @@ class _ProfileViewState extends State<ProfileView> {
                       label: "AI Configuration",
                       actionText: "Configure AI",
                       onTap: () {
-                        // TODO: navigator.push()
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => AIConfig()),
+                        );
                       },
                     ),
                     SettingsTile(

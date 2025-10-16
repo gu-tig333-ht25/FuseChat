@@ -6,14 +6,13 @@ class User {
   final String email;
   final String imageUrl;
 
-  const User({
+  User({
     required this.id,
     required this.name,
     required this.email,
     this.imageUrl = '',
   });
 
-  // Create from Firestore document
   factory User.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
     

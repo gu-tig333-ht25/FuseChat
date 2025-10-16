@@ -1,17 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:provider/provider.dart';
+import 'package:template/chatBot/chatBot.dart';
+import 'package:template/models/AI_model.dart';
+import 'package:template/models/conversation_model.dart';
 import '../services/firestore_service.dart';
 import '../models/message_model.dart';
-
-// 2do
-// Add references to Firebase, get current user, send messages to Firestore, and get messages from Firestore
-// Add LLM suggestions
-// ...
-// Fix spacing between messages etc.
-// Set chat title based on conversation
-// auto focus to text field https://docs.flutter.dev/cookbook/forms/focus
+import 'package:firebase_auth/firebase_auth.dart' as auth;
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({
@@ -53,9 +48,8 @@ class _ChatScreenState extends State<ChatScreen> {
                   vertical: 8.0,
                   horizontal: 16.0,
                 ),
-                child: Text(
-                  'LLM Suggestions Here...',
-                  style: TextStyle(color: Colors.grey[100]),
+                child: AISuggestionBoxWrapper(
+                  conversationId: widget.conversationId,
                 ),
               ),
             ),
@@ -93,6 +87,44 @@ class _ChatScreenState extends State<ChatScreen> {
           ],
         ),
       ),
+    );
+  }
+}
+
+class AISuggestionBoxWrapper extends StatelessWidget {
+  final String conversationId;
+
+  const AISuggestionBoxWrapper({
+    super.key,
+    required this.conversationId,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final firestoreService = Provider.of<FirestoreService>(context, listen: false);
+
+    return FutureBuilder<Conversation?>(
+      future: firestoreService.getConversationForLLM(conversationId),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const CircularProgressIndicator();
+        }
+
+        if (snapshot.hasError) {
+          return Text('Error loading conversation: ${snapshot.error}');
+        }
+
+        if (!snapshot.hasData || snapshot.data == null) {
+          return const Text('No conversation data available');
+        }
+
+        final conversation = snapshot.data!;
+        
+        return AISuggestionBox(
+          conversationId: conversationId,
+          messages: conversation.messages,
+        );
+      },
     );
   }
 }
@@ -139,7 +171,7 @@ class MessagesStream extends StatelessWidget {
           itemBuilder: (context, index) {
             final msg = messages[index];
             return MessageBubble(
-              sender: msg.senderId,
+              sender: msg.senderName ?? msg.senderId,
               text: msg.text,
               isMe: msg.senderId == currentUserId,
             );
@@ -225,6 +257,100 @@ class MessageBubble extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class AISuggestionBox extends StatelessWidget {
+  final String conversationId;
+  final List<Message> messages;
+
+  const AISuggestionBox({
+    required this.conversationId,
+    required this.messages,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    AISettings settings = context.watch<AISettings>();
+    Promptable? promptable = settings.promptable;
+    
+    if (promptable == null) {
+      String reasonText;
+      if (settings.api_key == null) {
+        reasonText = "API key has not been given";
+      } else if (!settings.aiSuggestionsEnabled) {
+        reasonText = "AI suggestions are disabled";
+      } else {
+        reasonText = "ChatBot error, perhaps wrong API key?";
+      }
+      return Text(reasonText);
+    }
+
+    Personality? personality = settings.selectedPersonality;
+    if (personality == null) {
+      return Text("Personality has not been selected");
+    }
+
+    // Get current user
+    final currentUserId = auth.FirebaseAuth.instance.currentUser?.uid ?? '';
+    
+    // Don't show suggestions if conversation is empty
+    if (messages.isEmpty) {
+      return const Text("Start a conversation to get AI suggestions");
+    }
+
+    // Find current user's name from messages
+    final currentUserName = messages
+        .firstWhere(
+          (m) => m.senderId == currentUserId,
+          orElse: () => Message(
+            id: '',
+            senderId: currentUserId,
+            senderName: 'You',
+            text: '',
+            isRead: false,
+          ),
+        )
+        .senderName ?? 'You';
+    
+    // Extract other user names
+    final otherUsers = messages
+        .where((m) => m.senderId != currentUserId)
+        .map((m) => m.senderName ?? 'Unknown')
+        .where((name) => name != 'Unknown')
+        .toSet()
+        .toList();
+
+    return FutureBuilder(
+      future: prompt(
+        prompter: promptable,
+        chat: messages,
+        user: currentUserName,
+        otherUsers: otherUsers,
+        personalitySpec: personality.instruction,
+      ),
+      builder: (context, snapshot) {
+        PromptResponse? promptResponse = snapshot.data;
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const CircularProgressIndicator();
+        } else if (snapshot.connectionState == ConnectionState.done) {
+          if (snapshot.hasError) {
+            return Text("❌ Error: ${snapshot.error}");
+          } else if (snapshot.hasData && promptResponse != null) {
+            return SelectableText(
+              promptResponse.responses ??
+                  promptResponse.stopReason ??
+                  "Empty ChatBot Response",
+            );
+          } else {
+            return const Text("⚠️ No data returned");
+          }
+        } else {
+          return const Text("Idle");
+        }
+      },
     );
   }
 }

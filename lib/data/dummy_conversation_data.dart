@@ -40,40 +40,40 @@ class FirestoreInitializer {
           'name': 'Björn Berg',
           'otherUserId': 'u2',
           'messages': [
-            {'senderId': currentUserId, 'text': 'Hej Björn!', 'minutesAgo': 20},
-            {'senderId': 'u2', 'text': 'Hej Alice! Hur är läget? bla bla bla bla', 'minutesAgo': 19},
+            {'senderId': currentUserId, 'senderName': 'Alice Andersson', 'text': 'Hej Björn!', 'minutesAgo': 20},
+            {'senderId': 'u2', 'senderName': 'Björn Berg', 'text': 'Hej Alice! Hur är läget? bla bla bla bla', 'minutesAgo': 19},
           ],
         },
         {
           'name': 'Carla Carlsson',
           'otherUserId': 'u3',
           'messages': [
-            {'senderId': 'u3', 'text': 'Vi ses imorgon på jobbet?', 'minutesAgo': 60},
-            {'senderId': currentUserId, 'text': 'Japp, vi ses då 👋 bla bla bla bla bla bla', 'minutesAgo': 50},
+            {'senderId': 'u3', 'senderName': 'Carla Carlsson', 'text': 'Vi ses imorgon på jobbet?', 'minutesAgo': 60},
+            {'senderId': currentUserId, 'senderName': 'Alice Andersson', 'text': 'Japp, vi ses då 👋 bla bla bla bla bla bla', 'minutesAgo': 50},
           ],
         },
         {
           'name': 'David Dahl',
           'otherUserId': 'u4',
           'messages': [
-            {'senderId': 'u4', 'text': 'Glöm inte rapporten!', 'minutesAgo': 180},
-            {'senderId': currentUserId, 'text': 'Tack för påminnelsen 🙈 bla bla bla bla', 'minutesAgo': 175},
+            {'senderId': 'u4', 'senderName': 'David Dahl', 'text': 'Glöm inte rapporten!', 'minutesAgo': 180},
+            {'senderId': currentUserId, 'senderName': 'Alice Andersson', 'text': 'Tack för påminnelsen 🙈 bla bla bla bla', 'minutesAgo': 175},
           ],
         },
         {
           'name': 'Ella Ek',
           'otherUserId': 'u5',
           'messages': [
-            {'senderId': currentUserId, 'text': 'Hur går det med projektet?', 'minutesAgo': 300},
-            {'senderId': 'u5', 'text': 'Bra! Nästan klart nu 😄 bla bla bla bla bla bla', 'minutesAgo': 290},
+            {'senderId': currentUserId, 'senderName': 'Alice Andersson', 'text': 'Hur går det med projektet?', 'minutesAgo': 300},
+            {'senderId': 'u5', 'senderName': 'Ella Ek', 'text': 'Bra! Nästan klart nu 😄 bla bla bla bla bla bla', 'minutesAgo': 290},
           ],
         },
         {
           'name': 'Filip Fors',
           'otherUserId': 'u6',
           'messages': [
-            {'senderId': 'u6', 'text': 'Kommer du på träningen?', 'minutesAgo': 420},
-            {'senderId': currentUserId, 'text': 'Ja, jag är på väg!', 'minutesAgo': 415},
+            {'senderId': 'u6', 'senderName': 'Filip Fors', 'text': 'Kommer du på träningen?', 'minutesAgo': 420},
+            {'senderId': currentUserId, 'senderName': 'Alice Andersson', 'text': 'Ja, jag är på väg!', 'minutesAgo': 415},
           ],
         },
       ];
@@ -92,15 +92,17 @@ class FirestoreInitializer {
           ),
         });
 
-        // Add messages as subcollection
+        // Add messages as subcollection with aiGenerated field
         for (var msg in messages) {
           await convRef.collection('messages').add({
             'senderId': msg['senderId'],
+            'senderName': msg['senderName'],
             'text': msg['text'],
             'timestamp': Timestamp.fromDate(
               DateTime.now().subtract(Duration(minutes: msg['minutesAgo'] as int)),
             ),
             'isRead': true,
+            'aiGenerated': false,  // Added for AI integration
           });
         }
 
