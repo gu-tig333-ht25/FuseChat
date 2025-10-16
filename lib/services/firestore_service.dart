@@ -12,9 +12,11 @@ class FirestoreService {
         .where('participants', arrayContains: userId)
         .orderBy('lastMessageTime', descending: true)
         .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => Conversation.fromFirestore(doc))
-            .toList());
+        .map(
+          (snapshot) => snapshot.docs
+              .map((doc) => Conversation.fromFirestore(doc))
+              .toList(),
+        );
   }
 
   Stream<List<Message>> getMessages(String conversationId) {
@@ -24,8 +26,10 @@ class FirestoreService {
         .collection('messages')
         .orderBy('timestamp', descending: false)
         .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.map((doc) => Message.fromFirestore(doc)).toList());
+        .map(
+          (snapshot) =>
+              snapshot.docs.map((doc) => Message.fromFirestore(doc)).toList(),
+        );
   }
 
   Future<void> sendMessage({

@@ -74,8 +74,10 @@ class _ChatScreenState extends State<ChatScreen> {
                       onSubmitted: (String text) async {
                         if (text.trim().isEmpty) return;
 
-                        final firestoreService =
-                            Provider.of<FirestoreService>(context, listen: false);
+                        final firestoreService = Provider.of<FirestoreService>(
+                          context,
+                          listen: false,
+                        );
 
                         await firestoreService.sendMessage(
                           conversationId: widget.conversationId,

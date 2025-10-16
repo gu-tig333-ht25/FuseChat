@@ -16,6 +16,68 @@ class ConversationScreen extends StatefulWidget {
 
 class _ConversationScreenState extends State<ConversationScreen> {
   String _searchText = '';
+  final TextEditingController _chatNameController = TextEditingController();
+
+  Future<void> createChatDialog(BuildContext context) {
+    final firestoreService = Provider.of<FirestoreService>(
+      context,
+      listen: false,
+    );
+    final currentUserId = auth.FirebaseAuth.instance.currentUser?.uid ?? '';
+
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Center(child: Text('Create Chat')),
+          content: TextField(
+            controller: _chatNameController,
+            decoration: InputDecoration(hintText: "chat name"),
+          ),
+          actions: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                TextButton(
+                  style: TextButton.styleFrom(
+                    textStyle: Theme.of(context).textTheme.labelLarge,
+                  ),
+                  child: const Text('Cancel'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                TextButton(
+                  style: TextButton.styleFrom(
+                    textStyle: Theme.of(context).textTheme.labelLarge,
+                  ),
+                  child: const Text('Create'),
+                  onPressed: () {
+                    final chatName = _chatNameController.text.trim();
+                    if (chatName.isEmpty) return;
+
+                    firestoreService.createConversation(
+                      name: chatName,
+                      participantIds: [currentUserId],
+                    );
+
+                    _chatNameController.clear();
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    _chatNameController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(context) {
@@ -30,9 +92,9 @@ class _ConversationScreenState extends State<ConversationScreen> {
         ),
         leading: IconButton(
           onPressed: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => ProfileView()),
-            );
+            Navigator.of(
+              context,
+            ).push(MaterialPageRoute(builder: (context) => ProfileView()));
           },
           icon: const Icon(Icons.person),
           tooltip: 'Profile',
@@ -63,9 +125,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                   }
 
                   if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return const Center(
-                      child: Text('No conversations yet'),
-                    );
+                    return const Center(child: Text('No conversations yet'));
                   }
 
                   final conversations = snapshot.data!;
@@ -79,9 +139,9 @@ class _ConversationScreenState extends State<ConversationScreen> {
                         child: ListTile(
                           leading: CircleAvatar(
                             child: Text(
-                              conv.name.isNotEmpty 
-                                ? conv.name[0].toUpperCase()
-                                : 'C',
+                              conv.name.isNotEmpty
+                                  ? conv.name[0].toUpperCase()
+                                  : 'C',
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
                           ),
@@ -121,7 +181,9 @@ class _ConversationScreenState extends State<ConversationScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          createChatDialog(context);
+        },
         child: const Icon(Icons.message),
       ),
     );
