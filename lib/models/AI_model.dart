@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'dart:collection';
-
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:template/chatBot/chatBot.dart';
+
+const String _PREFS_KEY_AI_SETTINGS = "AI_SETTINGS";
 
 const List<Personality> defaultPersonalities = [
   Personality(
@@ -12,83 +15,147 @@ const List<Personality> defaultPersonalities = [
   Personality(
     name: "Silly",
     desc: "Just a silly goose",
-    instruction: "Your tone in all following messages should be Silly",
+    instruction: "Your tone in all following messages should be silly",
   ),
 ];
 
 class AISettings extends ChangeNotifier {
-  final List<Personality> _personalities;
-  bool _aiSuggestionsEnabled;
+  List<Personality> _personalities = defaultPersonalities;
+  bool _aiSuggestionsEnabled = false;
   Personality? selectedPersonality;
-  String? _api_key;
+  String? _apiKey;
+  Promptable? _promptable;
 
-  AISettings({
-    List<Personality> personalities = defaultPersonalities,
-    bool aiSuggestionsEnabled = true,
-  }) : _personalities = personalities,
-       _aiSuggestionsEnabled = aiSuggestionsEnabled;
-
-  set aiSuggestionsEnabled(bool enabled) {
-    if (_aiSuggestionsEnabled != enabled) {
-      _aiSuggestionsEnabled = enabled;
-      notifyListeners();
-    }
+  AISettings() {
+    load();
+    addListener(() {
+      save();
+    });
   }
 
-  get aiSuggestionsEnabled => _aiSuggestionsEnabled;
+  // ------------------ Getters & Setters ------------------
+
+  bool get aiSuggestionsEnabled => _aiSuggestionsEnabled;
+  set aiSuggestionsEnabled(bool aiSuggestionsEnabled) {
+    _aiSuggestionsEnabled = aiSuggestionsEnabled;
+    notifyListeners();
+  }
 
   List<Personality> get personalities => UnmodifiableListView(_personalities);
 
-  bool isSelected(Personality personality) =>
-      personality == selectedPersonality;
+  bool isSelected(Personality p) => selectedPersonality == p;
 
-  bool selectPersonality(Personality pi) {
-    if (!_personalities.contains(pi)) return false;
-    selectedPersonality = pi;
+  bool selectPersonality(Personality p) {
+    if (!_personalities.contains(p)) return false;
+    selectedPersonality = p;
     notifyListeners();
     return true;
   }
 
-  void addPersonality(Personality personality) {
-    _personalities.add(personality);
+  void addPersonality(Personality p) {
+    _personalities.add(p);
     notifyListeners();
   }
 
   bool removeAt(int index) {
     if (index >= _personalities.length) return false;
-    if (isSelected(_personalities[index])) {
-      selectedPersonality = null;
-    }
+    if (isSelected(_personalities[index])) selectedPersonality = null;
     _personalities.removeAt(index);
     notifyListeners();
     return true;
   }
 
-  String? get api_key => _api_key;
-  Promptable? _promptable;
+  String? get api_key => _apiKey;
 
-  set api_key(String apiKey){
-    _promptable = Gemeni(apiKey);
-    _api_key = apiKey;
+  set api_key(String? value) {
+    _apiKey = value;
+    if (value != null && value.isNotEmpty) _promptable = Gemeni(value);
     notifyListeners();
   }
 
   Promptable? get promptable => _promptable;
+
+  // ------------------ Save / Load ------------------
+
+  Future<void> save() async {
+    final prefs = await SharedPreferences.getInstance();
+    final selectedIndex = selectedPersonality != null
+        ? _personalities.indexOf(selectedPersonality!)
+        : -1;
+
+    final jsonMap = {
+      'personalities': _personalities.map((p) => p.toJson()).toList(),
+      'aiSuggestionsEnabled': _aiSuggestionsEnabled,
+      'selectedIndex': selectedIndex,
+      'api_key': _apiKey,
+    };
+
+    await prefs.setString(_PREFS_KEY_AI_SETTINGS, jsonEncode(jsonMap));
+  }
+
+  Future<void> load() async {
+    final prefs = await SharedPreferences.getInstance();
+    final jsonString = prefs.getString(_PREFS_KEY_AI_SETTINGS);
+    if (jsonString == null) return;
+
+    try {
+      final data = jsonDecode(jsonString);
+      _personalities =
+          (data['personalities'] as List?)
+              ?.map((p) => Personality.fromJson(p))
+              .toList() ??
+          defaultPersonalities;
+
+      _aiSuggestionsEnabled = data['aiSuggestionsEnabled'] ?? true;
+
+      final index = data['selectedIndex'];
+      if (index is int && index >= 0 && index < _personalities.length) {
+        selectedPersonality = _personalities[index];
+      }
+
+      final key = data['api_key'];
+      if (key != null && key is String && key.isNotEmpty) {
+        _apiKey = key;
+        _promptable = Gemeni(key);
+      }
+    } catch (e) {
+      print('⚠️ Failed to load AISettings: $e');
+    }
+    notifyListeners();
+  }
 }
 
-
-
-
+// ------------------ Personality ------------------
 
 class Personality {
   final String name;
   final String desc;
   final IconData iconData;
   final String instruction;
+
   const Personality({
     required this.name,
     this.desc = "",
     required this.instruction,
     this.iconData = Icons.android,
   });
+
+  Map<String, dynamic> toJson() => {
+    'name': name,
+    'desc': desc,
+    'instruction': instruction,
+    'iconData': iconData.codePoint,
+  };
+
+  factory Personality.fromJson(Map<String, dynamic> json) {
+    return Personality(
+      name: json['name'] ?? '',
+      desc: json['desc'] ?? '',
+      instruction: json['instruction'] ?? '',
+      iconData: IconData(
+        json['iconData'] ?? Icons.android.codePoint,
+        fontFamily: 'MaterialIcons',
+      ),
+    );
+  }
 }
