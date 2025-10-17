@@ -24,6 +24,15 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   final messageTextController = TextEditingController();
+  final FocusNode messageFocusNode = FocusNode();
+  String? _lastSuggestion;
+
+  @override
+  void dispose() {
+    messageTextController.dispose();
+    messageFocusNode.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(context) {
@@ -43,13 +52,29 @@ class _ChatScreenState extends State<ChatScreen> {
             Card(
               color: Color(0xFF303030),
               margin: const EdgeInsets.all(8.0),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 8.0,
-                  horizontal: 16.0,
-                ),
-                child: AISuggestionBoxWrapper(
-                  conversationId: widget.conversationId,
+              child: InkWell(
+                onTap: () {
+                  // If we have a last suggestion from the LLM, copy it into the input
+                  if (_lastSuggestion != null &&
+                      _lastSuggestion!.trim().isNotEmpty) {
+                    messageTextController.text = _lastSuggestion!;
+                    messageTextController.selection = TextSelection.collapsed(
+                      offset: messageTextController.text.length,
+                    );
+                    messageFocusNode.requestFocus();
+                  }
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 8.0,
+                    horizontal: 16.0,
+                  ),
+                  child: AISuggestionBoxWrapper(
+                    conversationId: widget.conversationId,
+                    onSuggestionAvailable: (String? suggestion) {
+                      _lastSuggestion = suggestion;
+                    },
+                  ),
                 ),
               ),
             ),
@@ -61,6 +86,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     padding: const EdgeInsets.only(bottom: 8.0),
                     child: TextField(
                       controller: messageTextController,
+                      focusNode: messageFocusNode,
                       autofocus: true,
                       decoration: const InputDecoration(
                         hintText: 'Type a message...',
@@ -68,8 +94,10 @@ class _ChatScreenState extends State<ChatScreen> {
                       onSubmitted: (String text) async {
                         if (text.trim().isEmpty) return;
 
-                        final firestoreService =
-                            Provider.of<FirestoreService>(context, listen: false);
+                        final firestoreService = Provider.of<FirestoreService>(
+                          context,
+                          listen: false,
+                        );
 
                         await firestoreService.sendMessage(
                           conversationId: widget.conversationId,
@@ -78,6 +106,9 @@ class _ChatScreenState extends State<ChatScreen> {
                         );
 
                         messageTextController.clear();
+                        setState(
+                          () {},
+                        ); // Triggers rebuild for a new LLM suggestion
                       },
                     ),
                   ),
@@ -93,15 +124,20 @@ class _ChatScreenState extends State<ChatScreen> {
 
 class AISuggestionBoxWrapper extends StatelessWidget {
   final String conversationId;
+  final void Function(String?)? onSuggestionAvailable;
 
   const AISuggestionBoxWrapper({
     super.key,
     required this.conversationId,
+    this.onSuggestionAvailable,
   });
 
   @override
   Widget build(BuildContext context) {
-    final firestoreService = Provider.of<FirestoreService>(context, listen: false);
+    final firestoreService = Provider.of<FirestoreService>(
+      context,
+      listen: false,
+    );
 
     return FutureBuilder<Conversation?>(
       future: firestoreService.getConversationForLLM(conversationId),
@@ -119,10 +155,11 @@ class AISuggestionBoxWrapper extends StatelessWidget {
         }
 
         final conversation = snapshot.data!;
-        
+
         return AISuggestionBox(
           conversationId: conversationId,
           messages: conversation.messages,
+          onSuggestionAvailable: onSuggestionAvailable,
         );
       },
     );
@@ -170,8 +207,17 @@ class MessagesStream extends StatelessWidget {
           itemCount: messages.length,
           itemBuilder: (context, index) {
             final msg = messages[index];
+            String? previousSenderID = index > 0
+                ? messages[index - 1].senderId
+                : '';
+            String? nextSenderID = index < messages.length - 1
+                ? messages[index + 1].senderId
+                : '';
             return MessageBubble(
-              sender: msg.senderName ?? msg.senderId,
+              senderName: msg.senderName ?? msg.senderId,
+              senderID: msg.senderId,
+              previousSenderID: previousSenderID,
+              nextSenderID: nextSenderID,
               text: msg.text,
               isMe: msg.senderId == currentUserId,
             );
@@ -185,19 +231,53 @@ class MessagesStream extends StatelessWidget {
 class MessageBubble extends StatelessWidget {
   MessageBubble({
     super.key,
-    required this.sender,
+    required this.senderName,
     required this.text,
     required this.isMe,
+    required this.senderID,
+    required this.previousSenderID, // bubble design depends on sender continuity
+    required this.nextSenderID,
   });
 
-  final String sender;
+  final String senderName;
   final String text;
   final bool isMe;
+  final String senderID;
+  final String previousSenderID;
+  final String nextSenderID;
+
+  BorderRadius _getBubbleBorderRadius() {
+    const radius = Radius.circular(30.0);
+
+    bool isPreviousSame = senderID == previousSenderID;
+    bool isNextSame = senderID == nextSenderID;
+
+    if (isMe) {
+      return BorderRadius.only(
+        topLeft: radius,
+        topRight: isPreviousSame ? Radius.circular(5.0) : radius,
+        bottomLeft: radius,
+        bottomRight: isNextSame ? Radius.circular(5.0) : radius,
+      );
+    } else {
+      return BorderRadius.only(
+        topLeft: isPreviousSame ? Radius.circular(5.0) : radius,
+        topRight: radius,
+        bottomLeft: isNextSame ? Radius.circular(5.0) : radius,
+        bottomRight: radius,
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.all(10.0),
+      padding: EdgeInsets.only(
+        top: (previousSenderID == senderID ? 1.0 : 8.0),
+        bottom: (nextSenderID == senderID ? 1.0 : 8.0),
+        left: 10.0,
+        right: 10.0,
+      ),
       child: Column(
         crossAxisAlignment: isMe
             ? CrossAxisAlignment.end
@@ -205,7 +285,7 @@ class MessageBubble extends StatelessWidget {
         children: <Widget>[
           if (!isMe)
             Text(
-              sender,
+              senderName,
               style: TextStyle(fontSize: 12.0, color: Colors.white70),
             ),
           Row(
@@ -217,38 +297,37 @@ class MessageBubble extends StatelessWidget {
                 CircleAvatar(
                   radius: 15,
                   child: Text(
-                    sender[0].toUpperCase(),
+                    senderName[0].toUpperCase(),
                     style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
                   ),
                 ),
               SizedBox(width: 8),
-              Material(
-                borderRadius: isMe
-                    ? BorderRadius.only(
-                        topLeft: Radius.circular(30.0),
-                        bottomLeft: Radius.circular(30.0),
-                        bottomRight: Radius.circular(30.0),
-                      )
-                    : BorderRadius.only(
-                        bottomLeft: Radius.circular(30.0),
-                        bottomRight: Radius.circular(30.0),
-                        topRight: Radius.circular(30.0),
+              Flexible(
+                child: Material(
+                  borderRadius: _getBubbleBorderRadius(),
+                  elevation: 5.0,
+                  color: isMe
+                      ? const Color.fromARGB(255, 45, 93, 0)
+                      : const Color.fromARGB(255, 194, 194, 194),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                      vertical: 10.0,
+                      horizontal: 20.0,
+                    ),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        // Limit width so long messages wrap instead of overflowing
+                        maxWidth: MediaQuery.of(context).size.width * 0.7,
                       ),
-                elevation: 5.0,
-                color: isMe
-                    ? const Color.fromARGB(255, 45, 93, 0)
-                    : const Color.fromARGB(255, 194, 194, 194),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    vertical: 10.0,
-                    horizontal: 20.0,
-                  ),
-                  child: Text(
-                    text,
-                    style: GoogleFonts.inter(
-                      fontWeight: FontWeight.w500,
-                      color: isMe ? Colors.white : Colors.black,
-                      fontSize: 14.0,
+                      child: Text(
+                        text,
+                        softWrap: true,
+                        style: GoogleFonts.inter(
+                          fontWeight: FontWeight.w500,
+                          color: isMe ? Colors.white : Colors.black,
+                          fontSize: 14.0,
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -264,10 +343,12 @@ class MessageBubble extends StatelessWidget {
 class AISuggestionBox extends StatelessWidget {
   final String conversationId;
   final List<Message> messages;
+  final void Function(String?)? onSuggestionAvailable;
 
   const AISuggestionBox({
     required this.conversationId,
     required this.messages,
+    this.onSuggestionAvailable,
     super.key,
   });
 
@@ -275,7 +356,7 @@ class AISuggestionBox extends StatelessWidget {
   Widget build(BuildContext context) {
     AISettings settings = context.watch<AISettings>();
     Promptable? promptable = settings.promptable;
-    
+
     if (promptable == null) {
       String reasonText;
       if (settings.api_key == null) {
@@ -295,26 +376,28 @@ class AISuggestionBox extends StatelessWidget {
 
     // Get current user
     final currentUserId = auth.FirebaseAuth.instance.currentUser?.uid ?? '';
-    
+
     // Don't show suggestions if conversation is empty
     if (messages.isEmpty) {
       return const Text("Start a conversation to get AI suggestions");
     }
 
     // Find current user's name from messages
-    final currentUserName = messages
-        .firstWhere(
-          (m) => m.senderId == currentUserId,
-          orElse: () => Message(
-            id: '',
-            senderId: currentUserId,
-            senderName: 'You',
-            text: '',
-            isRead: false,
-          ),
-        )
-        .senderName ?? 'You';
-    
+    final currentUserName =
+        messages
+            .firstWhere(
+              (m) => m.senderId == currentUserId,
+              orElse: () => Message(
+                id: '',
+                senderId: currentUserId,
+                senderName: 'You',
+                text: '',
+                isRead: false,
+              ),
+            )
+            .senderName ??
+        'You';
+
     // Extract other user names
     final otherUsers = messages
         .where((m) => m.senderId != currentUserId)
@@ -337,13 +420,22 @@ class AISuggestionBox extends StatelessWidget {
           return const CircularProgressIndicator();
         } else if (snapshot.connectionState == ConnectionState.done) {
           if (snapshot.hasError) {
-            return Text("❌ Error: ${snapshot.error}");
+            return Text("❌ Error: \\${snapshot.error}");
           } else if (snapshot.hasData && promptResponse != null) {
-            return SelectableText(
-              promptResponse.responses ??
-                  promptResponse.stopReason ??
-                  "Empty ChatBot Response",
-            );
+            final suggestionText =
+                promptResponse.responses ??
+                promptResponse.stopReason ??
+                "Empty ChatBot Response";
+
+            // Notify parent that a suggestion is available
+            if (onSuggestionAvailable != null) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                onSuggestionAvailable!(suggestionText);
+              });
+            }
+
+            // Make suggestion tappable: when tapped, call the provided callback
+            return Text(suggestionText);
           } else {
             return const Text("⚠️ No data returned");
           }
