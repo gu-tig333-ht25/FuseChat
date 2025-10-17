@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:template/models/AI_model.dart';
+import 'package:flutter/gestures.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class AIConfig extends StatefulWidget {
   const AIConfig({super.key});
@@ -11,15 +13,37 @@ class AIConfig extends StatefulWidget {
 
 class _AIConfigState extends State<AIConfig> {
   final TextEditingController _controller = TextEditingController();
+  final TapGestureRecognizer _linkRecognizer = TapGestureRecognizer();
+
+  Future<void> _openLink(String url) async {
+    final uri = Uri.parse(url);
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+      // fallback / error handling
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Could not open link')));
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _linkRecognizer.onTap = () =>
+        _openLink("https://aistudio.google.com/app/api-keys");
+  }
+
   @override
   void dispose() {
     _controller.dispose();
+    _linkRecognizer.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     AISettings settings = context.watch<AISettings>();
+    _controller.text = settings.api_key ?? "";
+
     return Scaffold(
       appBar: AppBar(title: Text("AI settings")),
       body: Center(
@@ -32,23 +56,58 @@ class _AIConfigState extends State<AIConfig> {
                   Expanded(
                     child: TextField(
                       controller: _controller,
-                      decoration: const InputDecoration(labelText: 'Enter Gemeni API key'),
-                      
+                      decoration: const InputDecoration(
+                        labelText: 'Enter Gemeni API key',
+                      ),
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.only(left: 30),
-                    child: OutlinedButton(onPressed: () { 
-                      settings.api_key = _controller.text;
-                     },
-                    child: Text("OK"),),
-                  )
+                    child: OutlinedButton(
+                      onPressed: () {
+                        settings.api_key = _controller.text;
+                      },
+                      child: Text("OK"),
+                    ),
+                  ),
                 ],
               ),
-             if (settings.api_key != null) Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                child: const Divider(thickness: 1),
+              ValueListenableBuilder<TextEditingValue>(
+                valueListenable: _controller,
+                builder: (context, value, child) {
+                  if (value.text != ""){
+                    return const SizedBox.shrink();
+                  } 
+                  return Align(
+                    alignment: Alignment.centerLeft,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 15),
+                      child: RichText(
+                        text: TextSpan(
+                          style: Theme.of(context).textTheme.bodySmall,
+                          children: [
+                            const TextSpan(text: 'Don\'t have one? Get one '),
+                            TextSpan(
+                              text: 'here',
+                              style: const TextStyle(
+                                color: Colors.blue,
+                                decoration: TextDecoration.underline,
+                              ),
+                              recognizer: _linkRecognizer,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
               ),
+
+              if (settings.api_key != null)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  child: const Divider(thickness: 1),
+                ),
               if (settings.api_key != null)
                 Row(
                   children: [
@@ -69,6 +128,7 @@ class _AIConfigState extends State<AIConfig> {
                     Switch(
                       value: settings.aiSuggestionsEnabled,
                       onChanged: (value) {
+                        print("set toggle $value");
                         settings.aiSuggestionsEnabled = value;
                       },
                     ),
