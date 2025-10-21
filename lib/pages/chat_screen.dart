@@ -7,6 +7,7 @@ import 'package:template/models/conversation_model.dart';
 import '../services/firestore_service.dart';
 import '../models/message_model.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
+import 'profile_view/AI_config_view.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({
@@ -39,7 +40,20 @@ class _ChatScreenState extends State<ChatScreen> {
     final currentUserId = auth.FirebaseAuth.instance.currentUser?.uid ?? '';
 
     return Scaffold(
-      appBar: AppBar(title: Text(widget.chatTitle)),
+      appBar: AppBar(
+        title: Text(widget.chatTitle),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings, color: Colors.white),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => AIConfig()),
+              );
+            },
+          ),
+        ],
+      ),
       body: SafeArea(
         child: Column(
           children: <Widget>[
