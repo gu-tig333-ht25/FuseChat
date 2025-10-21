@@ -11,7 +11,6 @@ class FirestoreService {
   Stream<List<Conversation>> getConversations(String userId) {
     return _db
         .collection('conversations')
-        .where('participants', arrayContains: userId)
         .orderBy('lastMessageTime', descending: true)
         .snapshots()
         .map((snapshot) => snapshot.docs
