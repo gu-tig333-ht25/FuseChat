@@ -181,6 +181,9 @@ class MessagesStream extends StatelessWidget {
     final firestoreService = Provider.of<FirestoreService>(context);
     final ScrollController listScrollController = ScrollController();
 
+    List<String> userIDs =
+        []; // Keep track of participants for message bubble color coding
+
     return StreamBuilder<List<Message>>(
       stream: firestoreService.getMessages(conversationId),
       builder: (context, snapshot) {
@@ -207,6 +210,11 @@ class MessagesStream extends StatelessWidget {
           itemCount: messages.length,
           itemBuilder: (context, index) {
             final msg = messages[index];
+            final senderId = msg.senderId;
+            if (senderId != currentUserId && !userIDs.contains(senderId)) {
+              userIDs.add(senderId);
+            }
+            final msgColorIndex = userIDs.indexOf(senderId);
             String? previousSenderID = index > 0
                 ? messages[index - 1].senderId
                 : '';
@@ -220,6 +228,7 @@ class MessagesStream extends StatelessWidget {
               nextSenderID: nextSenderID,
               text: msg.text,
               isMe: msg.senderId == currentUserId,
+              colorIndex: msgColorIndex,
             );
           },
         );
@@ -237,6 +246,7 @@ class MessageBubble extends StatelessWidget {
     required this.senderID,
     required this.previousSenderID, // bubble design depends on sender continuity
     required this.nextSenderID,
+    required this.colorIndex,
   });
 
   final String senderName;
@@ -245,6 +255,7 @@ class MessageBubble extends StatelessWidget {
   final String senderID;
   final String previousSenderID;
   final String nextSenderID;
+  final int colorIndex;
 
   BorderRadius _getBubbleBorderRadius() {
     const radius = Radius.circular(30.0);
@@ -269,6 +280,20 @@ class MessageBubble extends StatelessWidget {
     }
   }
 
+  Color getBubbleColor() {
+    // Define a list of colors to cycle through for different users
+    final colors = [
+      Color.fromARGB(255, 194, 194, 194),
+      Colors.deepPurpleAccent,
+      Colors.teal,
+      Colors.indigo,
+      Colors.cyan,
+      Colors.amber,
+      Colors.deepOrange,
+    ];
+    return colors[colorIndex % colors.length];
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -283,7 +308,7 @@ class MessageBubble extends StatelessWidget {
             ? CrossAxisAlignment.end
             : CrossAxisAlignment.start,
         children: <Widget>[
-          if (!isMe)
+          if (!isMe && previousSenderID != senderID)
             Text(
               senderName,
               style: TextStyle(fontSize: 12.0, color: Colors.white70),
@@ -308,7 +333,7 @@ class MessageBubble extends StatelessWidget {
                   elevation: 5.0,
                   color: isMe
                       ? const Color.fromARGB(255, 45, 93, 0)
-                      : const Color.fromARGB(255, 194, 194, 194),
+                      : getBubbleColor(),
                   child: Padding(
                     padding: EdgeInsets.symmetric(
                       vertical: 10.0,
