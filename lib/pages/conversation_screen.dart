@@ -6,6 +6,7 @@ import '../services/firestore_service.dart';
 import '../models/conversation_model.dart';
 import 'chat_screen.dart';
 import 'profile_view/profile_view.dart';
+import 'package:template/theme/themedata.dart';
 
 class ConversationScreen extends StatefulWidget {
   const ConversationScreen({super.key});
@@ -138,6 +139,9 @@ class _ConversationScreenState extends State<ConversationScreen> {
                         margin: EdgeInsets.all(2),
                         child: ListTile(
                           leading: CircleAvatar(
+                            backgroundColor:
+                                conversationBubbleColors[index %
+                                    conversationBubbleColors.length],
                             child: Text(
                               conv.name.isNotEmpty
                                   ? conv.name[0].toUpperCase()

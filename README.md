@@ -1,7 +1,7 @@
-# ChatFuse 💬  
+# FuseChat 💬  
 *A Group Chat App with AI-Powered Reply Suggestions*
 
-ChatFuse is a Flutter-based mobile application that brings a creative twist to group messaging.  
+FuseChat is a Flutter-based mobile application that brings a creative twist to group messaging.  
 Users can chat in real time while receiving AI-generated message suggestions based on a configurable personality — such as **factual**, **mischievous**, or **supportive**.  
 Written as a group project for the course "Mobile app development with Flutter" at GU.
 

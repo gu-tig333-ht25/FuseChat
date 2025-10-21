@@ -1,6 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+// conversation bubble colors used across the app
+const List<Color> conversationBubbleColors = [
+  Color.fromARGB(255, 194, 194, 194),
+  Colors.deepPurpleAccent,
+  Colors.teal,
+  Colors.indigo,
+  Colors.cyan,
+  Colors.amber,
+  Colors.deepOrange,
+];
+
 final ThemeData fuseChatDarkTheme = ThemeData(
   useMaterial3: true,
   brightness: Brightness.dark,
