@@ -11,12 +11,12 @@ const List<Color> conversationBubbleColors = [
   Colors.deepOrange,
 ];
 const ColorScheme darkColorScheme = ColorScheme.dark(
-    primary: Color(0xFF727A69),
-    secondary: Color.fromRGBO(45, 93, 0, 1),
-    surface: Color(0xFF1E1E1E),
-    onSurface: Color.fromARGB(61, 255, 255, 255),
-    error: Colors.redAccent,
-  );
+  primary: Color(0xFF727A69),
+  secondary: Color(0xFF2A2A2A),
+  surface: Color(0xFF1E1E1E),
+  onSurface: Color.fromARGB(61, 255, 255, 255),
+  error: Colors.redAccent,
+);
 
 final ThemeData fuseChatDarkTheme = ThemeData(
   useMaterial3: true,
@@ -43,7 +43,7 @@ final ThemeData fuseChatDarkTheme = ThemeData(
       color: Colors.white,
     ),
   ),
-  
+
   // Input fields
   inputDecorationTheme: InputDecorationTheme(
     filled: true,
@@ -83,7 +83,7 @@ final ThemeData fuseChatDarkTheme = ThemeData(
   ),
 
   // Floating button
-  floatingActionButtonTheme:  FloatingActionButtonThemeData(
+  floatingActionButtonTheme: FloatingActionButtonThemeData(
     backgroundColor: darkColorScheme.secondary,
     foregroundColor: Colors.white,
   ),
@@ -96,51 +96,53 @@ final ThemeData fuseChatDarkTheme = ThemeData(
   ),
 
   // Typography
-  textTheme: ThemeData.dark().textTheme.apply(
-    bodyColor: Colors.white,
-    displayColor: Colors.white,
-    decorationColor: Colors.white
-  ).copyWith(
-    displayLarge: GoogleFonts.irishGrover(
-      fontSize: 80,
-      fontWeight: FontWeight.w400,
-      color: Colors.white,
-      shadows: const [
-        Shadow(offset: Offset(0, 0), blurRadius: 20, color: Colors.white24),
-        Shadow(offset: Offset(2, 2), blurRadius: 4, color: Colors.black54),
-      ],
-    ),
-    headlineMedium: GoogleFonts.inter(
-      fontSize: 24,
-      fontWeight: FontWeight.w600,
-      color: Colors.white,
-    ),
-    bodyMedium: GoogleFonts.inter(
-      fontSize: 16,
-      fontWeight: FontWeight.w500,
-      color: Colors.white,
-    ),
-    bodySmall: GoogleFonts.inter(
-      fontSize: 14,
-      fontWeight: FontWeight.w500,
-      color: Colors.white,
-    ),
-  ),
+  textTheme: ThemeData.dark().textTheme
+      .apply(
+        bodyColor: Colors.white,
+        displayColor: Colors.white,
+        decorationColor: Colors.white,
+      )
+      .copyWith(
+        displayLarge: GoogleFonts.irishGrover(
+          fontSize: 80,
+          fontWeight: FontWeight.w400,
+          color: Colors.white,
+          shadows: const [
+            Shadow(offset: Offset(0, 0), blurRadius: 20, color: Colors.white24),
+            Shadow(offset: Offset(2, 2), blurRadius: 4, color: Colors.black54),
+          ],
+        ),
+        headlineMedium: GoogleFonts.inter(
+          fontSize: 24,
+          fontWeight: FontWeight.w600,
+          color: Colors.white,
+        ),
+        bodyMedium: GoogleFonts.inter(
+          fontSize: 16,
+          fontWeight: FontWeight.w500,
+          color: Colors.white,
+        ),
+        bodySmall: GoogleFonts.inter(
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+          color: Colors.white,
+        ),
+      ),
 
-  dividerTheme:  DividerThemeData(
+  dividerTheme: DividerThemeData(
     color: darkColorScheme.onSurface,
     thickness: 2,
     space: 0,
   ),
 );
 
- ColorScheme lightColorScheme = ColorScheme.light(
-    primary: Color.fromARGB(166, 171, 255, 102),
-    secondary: Color(0xFF73A942),
-    surface: Color(0xFFFFFFFF),
-    onSurface: const Color.fromARGB(255, 230, 230, 230),
-    error: Colors.redAccent,
-  );
+ColorScheme lightColorScheme = ColorScheme.light(
+  primary: Color.fromARGB(166, 171, 255, 102),
+  secondary: Color(0xFF73A942),
+  surface: Color(0xFFFFFFFF),
+  onSurface: const Color.fromARGB(255, 230, 230, 230),
+  error: Colors.redAccent,
+);
 
 final ThemeData fuseChatLightTheme = ThemeData(
   useMaterial3: true,
@@ -167,7 +169,7 @@ final ThemeData fuseChatLightTheme = ThemeData(
       color: Colors.black87,
     ),
   ),
-  
+
   // Input fields
   inputDecorationTheme: InputDecorationTheme(
     filled: true,
@@ -220,24 +222,25 @@ final ThemeData fuseChatLightTheme = ThemeData(
   ),
 
   // Typography
-  textTheme: ThemeData.light().textTheme.apply(
-    bodyColor: Colors.black,
-    displayColor: Colors.black,
-    decorationColor: Colors.black,
-    
-  ).copyWith(
-    displayLarge: GoogleFonts.irishGrover(
-      fontSize: 80,
-      fontWeight: FontWeight.w400,
-      color: Colors.black,
-      shadows: const [
-        Shadow(offset: Offset(0, 0), blurRadius: 10, color: Colors.black),
-        Shadow(offset: Offset(2, 2), blurRadius: 4, color: Colors.grey),
-      ],
-    ),
-  ),
+  textTheme: ThemeData.light().textTheme
+      .apply(
+        bodyColor: Colors.black,
+        displayColor: Colors.black,
+        decorationColor: Colors.black,
+      )
+      .copyWith(
+        displayLarge: GoogleFonts.irishGrover(
+          fontSize: 80,
+          fontWeight: FontWeight.w400,
+          color: Colors.black,
+          shadows: const [
+            Shadow(offset: Offset(0, 0), blurRadius: 10, color: Colors.black),
+            Shadow(offset: Offset(2, 2), blurRadius: 4, color: Colors.grey),
+          ],
+        ),
+      ),
 
-  dividerTheme:  DividerThemeData(
+  dividerTheme: DividerThemeData(
     color: lightColorScheme.onSurface,
     thickness: 10,
     space: 1,
