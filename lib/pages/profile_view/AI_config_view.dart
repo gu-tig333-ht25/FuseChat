@@ -64,10 +64,19 @@ class _AIConfigState extends State<AIConfig> {
                   Padding(
                     padding: const EdgeInsets.only(left: 30),
                     child: OutlinedButton(
+                      style: ButtonStyle(
+                        backgroundColor: WidgetStateProperty.all(
+                          settings.api_key == null ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.secondary,
+                        ),
+                        shadowColor: WidgetStateProperty.all(
+                          Theme.of(context).colorScheme.onSurface,
+                        ),
+
+                      ),
                       onPressed: () {
                         settings.api_key = _controller.text;
                       },
-                      child: Text("OK"),
+                      child: Text("OK", style: TextTheme.of(context).labelLarge,),
                     ),
                   ),
                 ],
@@ -75,9 +84,9 @@ class _AIConfigState extends State<AIConfig> {
               ValueListenableBuilder<TextEditingValue>(
                 valueListenable: _controller,
                 builder: (context, value, child) {
-                  if (value.text != ""){
+                  if (value.text != "") {
                     return const SizedBox.shrink();
-                  } 
+                  }
                   return Align(
                     alignment: Alignment.centerLeft,
                     child: Padding(
@@ -126,6 +135,8 @@ class _AIConfigState extends State<AIConfig> {
                     ),
                     Spacer(),
                     Switch(
+                      inactiveTrackColor: Theme.of(context).colorScheme.primary,
+                     activeTrackColor: Theme.of(context).colorScheme.secondary,
                       value: settings.aiSuggestionsEnabled,
                       onChanged: (value) {
                         print("set toggle $value");
@@ -164,7 +175,7 @@ class RowItem extends StatelessWidget {
   Widget build(BuildContext context) {
     Color backgroundColor = isSelected
         ? Theme.of(context).colorScheme.secondary
-        : Theme.of(context).colorScheme.surface;
+        : Theme.of(context).colorScheme.primary;
     TextStyle? titleStyle = Theme.of(context).textTheme.titleMedium;
     TextStyle? descStyle = Theme.of(context).textTheme.labelMedium;
 
@@ -181,8 +192,8 @@ class RowItem extends StatelessWidget {
           color: backgroundColor, // background color
           borderRadius: BorderRadius.circular(15),
           border: BoxBorder.all(
-            color: Theme.of(context).colorScheme.primary,
-            width: 2,
+            color: Theme.of(context).colorScheme.secondary,
+            width: 3,
           ),
         ),
         child: Row(

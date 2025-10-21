@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
+import '../models/theme_model.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -48,6 +49,7 @@ class _AuthScreenState extends State<AuthScreen> {
 
   @override
   Widget build(BuildContext context) {
+    ThemeSettings themeSettings = context.watch<ThemeSettings>();
     final theme = Theme.of(context);
 
     return Scaffold(
@@ -98,6 +100,7 @@ class _AuthScreenState extends State<AuthScreen> {
                       width: double.infinity,
                       height: 50,
                       child: ElevatedButton(
+                        style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(Theme.of(context).colorScheme.secondary)),
                         onPressed: auth.isLoading
                             ? null
                             : () => _authenticate(auth),
@@ -128,6 +131,26 @@ class _AuthScreenState extends State<AuthScreen> {
                   ),
                 ),
                 const Spacer(),
+                Center(
+                  child: Row(
+                      children: [
+                         Icon(
+                        Icons.dark_mode,
+                        color: TextTheme.of(context).labelLarge?.color,
+                        size: 30,
+                      ),
+                       Switch(
+                        inactiveTrackColor: Theme.of(context).colorScheme.primary,
+                        activeTrackColor: Theme.of(context).colorScheme.secondary,
+                        value: themeSettings.isDarkMode,
+                        onChanged: (value) {
+                          print("set toggle $value");
+                          themeSettings.isDarkMode = value;
+                        },
+                      ),
+                      ],
+                    ),
+                ),
               ],
             ),
           ),
