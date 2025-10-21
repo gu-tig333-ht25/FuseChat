@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-
+const List<Color> conversationBubbleColors = [
+  Color.fromARGB(255, 194, 194, 194),
+  Colors.deepPurpleAccent,
+  Colors.teal,
+  Colors.indigo,
+  Colors.cyan,
+  Colors.amber,
+  Colors.deepOrange,
+];
 const ColorScheme darkColorScheme = ColorScheme.dark(
     primary: Color(0xFF727A69),
     secondary: Color.fromRGBO(45, 93, 0, 1),
