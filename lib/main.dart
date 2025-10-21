@@ -6,6 +6,7 @@ import 'theme/themedata.dart';
 import 'services/auth_service.dart';
 import 'services/auth_wrapper.dart';
 import 'services/firestore_service.dart';
+import 'models/theme_model.dart';
 
 import 'models/AI_model.dart';
 
@@ -20,9 +21,12 @@ void main() async {
     throw ('Firebase initialization failed: $e');
   }
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => AISettings(),
-      child: MyApp(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AISettings()),
+        ChangeNotifierProvider(create:(context) => ThemeSettings(fuseChatDarkTheme),)
+      ],
+      child: MyApp()
     ),
   );
 }
@@ -32,6 +36,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    ThemeSettings themeSettings = context.watch<ThemeSettings>();
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => MyAuthProvider()),
@@ -39,7 +44,7 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        theme: fuseChatDarkTheme,
+        theme: themeSettings.theme,
         home: const AuthWrapper(),
       ),
     );

@@ -89,15 +89,19 @@ class _ConversationScreenState extends State<ConversationScreen> {
       appBar: AppBar(
         title: Text(
           'FuseChat',
-          style: GoogleFonts.irishGrover(fontSize: 28, color: Colors.white),
+          style: GoogleFonts.irishGrover(
+            textStyle: Theme.of(context).textTheme.displayMedium,
+          ),
         ),
         leading: IconButton(
+          color: Theme.of(context).colorScheme.secondary,
           onPressed: () {
             Navigator.of(
               context,
             ).push(MaterialPageRoute(builder: (context) => ProfileView()));
           },
-          icon: const Icon(Icons.person),
+          icon: Icon(Icons.person),
+          iconSize: 50,
           tooltip: 'Profile',
         ),
       ),
@@ -107,9 +111,22 @@ class _ConversationScreenState extends State<ConversationScreen> {
             Padding(
               padding: EdgeInsets.all(16),
               child: SearchBar(
+                
+                shadowColor: WidgetStatePropertyAll(Theme.of(context).colorScheme.primary),
+                backgroundColor: WidgetStatePropertyAll(
+                  Theme.of(context).colorScheme.onSurface,
+                ),
+                textStyle: WidgetStatePropertyAll(
+                  TextTheme.of(context).bodyMedium?.copyWith(
+                    color: TextTheme.of(
+                      context,
+                    ).bodyMedium?.color?.withValues(alpha: 0.4),
+                  ),
+                ),
+                
                 hintText: 'Search conversations',
-                leading: Icon(Icons.menu, color: Colors.black),
-                trailing: [Icon(Icons.search, color: Colors.black)],
+                leading: Icon(Icons.menu),
+                trailing: [Icon(Icons.search)],
                 onChanged: (value) {
                   setState(() {
                     _searchText = value;
@@ -130,7 +147,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                   }
 
                   final conversations = snapshot.data!;
-
+                  print(TextTheme.of(context).titleMedium?.color);
                   return ListView.builder(
                     itemCount: conversations.length,
                     itemBuilder: (context, index) {
@@ -146,18 +163,23 @@ class _ConversationScreenState extends State<ConversationScreen> {
                               conv.name.isNotEmpty
                                   ? conv.name[0].toUpperCase()
                                   : 'C',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                              style: TextTheme.of(context).titleMedium
+                                  ?.copyWith(fontWeight: FontWeight.bold),
                             ),
                           ),
                           title: Text(
                             conv.name,
-                            style: TextStyle(color: Colors.white),
+                            style: TextTheme.of(context).titleMedium,
                           ),
                           subtitle: Text(
                             conv.lastMessage,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: TextStyle(fontSize: 13),
+                            style: TextTheme.of(context).labelLarge?.copyWith(
+                              color: TextTheme.of(
+                                context,
+                              ).labelLarge?.color?.withValues(alpha: 0.5),
+                            ),
                           ),
                           trailing: conv.lastMessageTime != null
                               ? Text(

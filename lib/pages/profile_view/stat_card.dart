@@ -18,11 +18,11 @@ class StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: Colors.transparent,
+      color: Theme.of(context).colorScheme.onSurface,
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: Colors.grey.shade300, width: 1),
+        side: BorderSide(color: Theme.of(context).colorScheme.secondary, width: 3),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 20),
@@ -33,19 +33,12 @@ class StatCard extends StatelessWidget {
             const SizedBox(height: 20),
             Text(
               value,
-              style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.w500,
-                color: Color.fromARGB(255, 204, 208, 211),
-              ),
+              style: TextTheme.of(context).titleLarge,
             ),
             const SizedBox(height: 20),
             Text(
               label,
-              style: TextStyle(
-                fontSize: 14,
-                color: Color.fromARGB(255, 204, 208, 211),
-              ),
+              style: TextTheme.of(context).labelLarge,
             ),
           ],
         ),

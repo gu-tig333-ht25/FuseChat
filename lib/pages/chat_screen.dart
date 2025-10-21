@@ -65,7 +65,7 @@ class _ChatScreenState extends State<ChatScreen> {
               ),
             ),
             Card(
-              color: Color(0xFF303030),
+              color: Theme.of(context).colorScheme.onSurface,
               margin: const EdgeInsets.all(8.0),
               child: InkWell(
                 onTap: () {
@@ -84,7 +84,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     vertical: 8.0,
                     horizontal: 16.0,
                   ),
-                  child: AISuggestionBoxWrapper(
+                  child: AISuggestionBoxWrapper(  
                     conversationId: widget.conversationId,
                     onSuggestionAvailable: (String? suggestion) {
                       _lastSuggestion = suggestion;
@@ -312,7 +312,7 @@ class MessageBubble extends StatelessWidget {
           if (!isMe && previousSenderID != senderID)
             Text(
               senderName,
-              style: TextStyle(fontSize: 12.0, color: Colors.white70),
+              style: TextTheme.of(context).labelSmall,
             ),
           Row(
             mainAxisAlignment: isMe
@@ -324,7 +324,7 @@ class MessageBubble extends StatelessWidget {
                   radius: 15,
                   child: Text(
                     senderName[0].toUpperCase(),
-                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
+                    style: TextTheme.of(context).bodyLarge?.copyWith(fontSize: 20),
                   ),
                 ),
               SizedBox(width: 8),
@@ -348,12 +348,10 @@ class MessageBubble extends StatelessWidget {
                       ),
                       child: Text(
                         text,
-                        softWrap: true,
-                        style: GoogleFonts.inter(
+                        softWrap: true, 
+                        style: TextTheme.of(context).bodySmall?.copyWith(
                           fontWeight: FontWeight.w500,
-                          color: isMe ? Colors.white : Colors.black,
-                          fontSize: 14.0,
-                        ),
+                          color: isMe ? Colors.white : Theme.of(context).brightness == Brightness.light ?  Colors.black : Colors.white,)
                       ),
                     ),
                   ),
