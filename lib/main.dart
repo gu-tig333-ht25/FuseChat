@@ -24,9 +24,13 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AISettings()),
-        ChangeNotifierProvider(create:(context) => ThemeSettings(fuseChatDarkTheme),)
+        ChangeNotifierProvider(
+          create: (context) => ThemeSettings(fuseChatDarkTheme),
+        ),
+        ChangeNotifierProvider(create: (_) => MyAuthProvider()),
+        Provider<FirestoreService>(create: (_) => FirestoreService()),
       ],
-      child: MyApp()
+      child: MyApp(),
     ),
   );
 }
@@ -37,16 +41,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ThemeSettings themeSettings = context.watch<ThemeSettings>();
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => MyAuthProvider()),
-        Provider<FirestoreService>(create: (_) => FirestoreService()),
-      ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        theme: themeSettings.theme,
-        home: const AuthWrapper(),
-      ),
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: themeSettings.theme,
+      home: const AuthWrapper(),
     );
   }
 }
