@@ -9,6 +9,7 @@ import '../models/message_model.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'profile_view/AI_config_view.dart';
 import 'package:template/theme/themedata.dart';
+import 'package:intl/intl.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({
@@ -84,7 +85,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     vertical: 8.0,
                     horizontal: 16.0,
                   ),
-                  child: AISuggestionBoxWrapper(  
+                  child: AISuggestionBoxWrapper(
                     conversationId: widget.conversationId,
                     onSuggestionAvailable: (String? suggestion) {
                       _lastSuggestion = suggestion;
@@ -244,6 +245,7 @@ class MessagesStream extends StatelessWidget {
               text: msg.text,
               isMe: msg.senderId == currentUserId,
               colorIndex: msgColorIndex,
+              timestamp: msg.timestamp,
             );
           },
         );
@@ -262,6 +264,7 @@ class MessageBubble extends StatelessWidget {
     required this.previousSenderID, // bubble design depends on sender continuity
     required this.nextSenderID,
     required this.colorIndex,
+    this.timestamp,
   });
 
   final String senderName;
@@ -271,6 +274,20 @@ class MessageBubble extends StatelessWidget {
   final String previousSenderID;
   final String nextSenderID;
   final int colorIndex;
+  final DateTime? timestamp;
+
+  String _formatTimestamp(DateTime time) {
+    final now = DateTime.now();
+    final diff = now.difference(time);
+
+    if (diff.inDays == 0) {
+      return DateFormat('HH:mm').format(time);
+    } else if (diff.inDays == 1) {
+      return 'Yesterday ${DateFormat('HH:mm').format(time)}';
+    } else {
+      return DateFormat('d MMM HH:mm').format(time);
+    }
+  }
 
   BorderRadius _getBubbleBorderRadius() {
     const radius = Radius.circular(30.0);
@@ -294,7 +311,7 @@ class MessageBubble extends StatelessWidget {
       );
     }
   }
-
+  
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -324,7 +341,9 @@ class MessageBubble extends StatelessWidget {
                   radius: 15,
                   child: Text(
                     senderName[0].toUpperCase(),
-                    style: TextTheme.of(context).bodyLarge?.copyWith(fontSize: 20),
+                    style: TextTheme.of(
+                      context,
+                    ).bodyLarge?.copyWith(fontSize: 20),
                   ),
                 ),
               SizedBox(width: 8),
@@ -348,10 +367,15 @@ class MessageBubble extends StatelessWidget {
                       ),
                       child: Text(
                         text,
-                        softWrap: true, 
+                        softWrap: true,
                         style: TextTheme.of(context).bodySmall?.copyWith(
                           fontWeight: FontWeight.w500,
-                          color: isMe ? Colors.white : Theme.of(context).brightness == Brightness.light ?  Colors.black : Colors.white,)
+                          color: isMe
+                              ? Colors.white
+                              : Theme.of(context).brightness == Brightness.light
+                              ? Colors.black
+                              : Colors.white,
+                        ),
                       ),
                     ),
                   ),
@@ -359,6 +383,18 @@ class MessageBubble extends StatelessWidget {
               ),
             ],
           ),
+          if (timestamp != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 2.0, left: 4.0, right: 4.0),
+              child: Text(
+                _formatTimestamp(timestamp!),
+                style: TextTheme.of(context).labelSmall?.copyWith(
+                  color: Theme.of(context).textTheme.labelSmall?.color
+                    ?..withValues(alpha: 0.6),
+                  fontSize: 10,
+                ),
+              ),
+            ),
         ],
       ),
     );

@@ -48,13 +48,13 @@ class _ProfileViewState extends State<ProfileView> {
 
   @override
   Widget build(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser;
     ThemeSettings themeSettings = context.watch<ThemeSettings>();
-
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
         title: Text(
-          "${profileName.trim().isEmpty == false ? profileName : 'User'}'s Profile",
+          "${user?.displayName ?? user?.email?.split('@').first ?? 'User'}'s Profile",
           style: TextTheme.of(context).headlineLarge,
         ),
         actions: [
@@ -78,8 +78,13 @@ class _ProfileViewState extends State<ProfileView> {
                     children: [
                       const SizedBox(height: 20),
                       CircleAvatar(
-                        radius: 60,
-                        backgroundImage: AssetImage("assets/jane_doe.png"),
+                        radius: 30,
+                        child: Text(
+                          (profileEmail[0]).toUpperCase(),
+                          style: Theme.of(
+                            context,
+                          ).textTheme.titleLarge?.copyWith(fontSize: 22),
+                        ),
                       ),
                       const SizedBox(height: 20),
                       Text(

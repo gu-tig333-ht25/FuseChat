@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
 import '../models/theme_model.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -33,6 +35,22 @@ class _AuthScreenState extends State<AuthScreen> {
         await auth.signup(_emailController.text, _passwordController.text);
       }
 
+      final currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser != null) {
+        final userRef = FirebaseFirestore.instance
+            .collection('users')
+            .doc(currentUser.uid);
+
+        final doc = await userRef.get();
+        if (!doc.exists) {
+          final email = currentUser.email ?? '';
+          final name = email.contains('@')
+              ? email.split('@').first
+              : currentUser.uid;
+          final cname = name[0].toUpperCase() + name.substring(1);
+          await userRef.set({'name': cname, 'email': email, 'imageUrl': ''});
+        }
+      }
       // AuthWrapper will automatically navigate to ConversationScreen
       // No need to manually navigate here
     } catch (error) {
@@ -93,14 +111,18 @@ class _AuthScreenState extends State<AuthScreen> {
                   },
                 ),
                 const SizedBox(height: 32),
-                
+
                 Consumer<MyAuthProvider>(
                   builder: (context, auth, child) {
                     return SizedBox(
                       width: double.infinity,
                       height: 50,
                       child: ElevatedButton(
-                        style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(Theme.of(context).colorScheme.secondary)),
+                        style: ButtonStyle(
+                          backgroundColor: WidgetStatePropertyAll(
+                            Theme.of(context).colorScheme.secondary,
+                          ),
+                        ),
                         onPressed: auth.isLoading
                             ? null
                             : () => _authenticate(auth),
@@ -133,23 +155,27 @@ class _AuthScreenState extends State<AuthScreen> {
                 const Spacer(),
                 Center(
                   child: Row(
-                      children: [
-                         Icon(
+                    children: [
+                      Icon(
                         Icons.dark_mode,
                         color: TextTheme.of(context).labelLarge?.color,
                         size: 30,
                       ),
-                       Switch(
-                        inactiveTrackColor: Theme.of(context).colorScheme.primary,
-                        activeTrackColor: Theme.of(context).colorScheme.secondary,
+                      Switch(
+                        inactiveTrackColor: Theme.of(
+                          context,
+                        ).colorScheme.primary,
+                        activeTrackColor: Theme.of(
+                          context,
+                        ).colorScheme.secondary,
                         value: themeSettings.isDarkMode,
                         onChanged: (value) {
                           print("set toggle $value");
                           themeSettings.isDarkMode = value;
                         },
                       ),
-                      ],
-                    ),
+                    ],
+                  ),
                 ),
               ],
             ),

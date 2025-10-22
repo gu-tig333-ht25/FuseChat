@@ -5,7 +5,7 @@ import '../models/user_model.dart';
 
 class FirestoreService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
-  
+
   final Map<String, String> _nameCache = {};
 
   Stream<List<Conversation>> getConversations(String userId) {
@@ -13,15 +13,20 @@ class FirestoreService {
         .collection('conversations')
         .orderBy('lastMessageTime', descending: true)
         .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => Conversation.fromFirestore(doc))
-            .toList());
+        .map(
+          (snapshot) => snapshot.docs
+              .map((doc) => Conversation.fromFirestore(doc))
+              .toList(),
+        );
   }
 
   // Get a single conversation by ID
   Future<Conversation?> getConversation(String conversationId) async {
     try {
-      final doc = await _db.collection('conversations').doc(conversationId).get();
+      final doc = await _db
+          .collection('conversations')
+          .doc(conversationId)
+          .get();
       if (doc.exists) {
         return Conversation.fromFirestore(doc);
       }
@@ -48,8 +53,10 @@ class FirestoreService {
         .collection('messages')
         .orderBy('timestamp', descending: false)
         .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.map((doc) => Message.fromFirestore(doc)).toList());
+        .map(
+          (snapshot) =>
+              snapshot.docs.map((doc) => Message.fromFirestore(doc)).toList(),
+        );
   }
 
   // Get sender name with caching
@@ -61,7 +68,19 @@ class FirestoreService {
     try {
       final userDoc = await _db.collection('users').doc(userId).get();
       if (userDoc.exists) {
-        final name = userDoc.data()?['name'] ?? 'Unknown User';
+        final data = userDoc.data() ?? {};
+        String name = (data['name'] ?? '').trim();
+        final email = (data['email'] ?? '').trim();
+
+        // If name is empty, derive from email
+        if (name.isEmpty) {
+          name = email.split('@').first;
+        }
+
+        final currentName = (data['name'] ?? '').toString().trim();
+        if (currentName.isEmpty && name.isNotEmpty) {
+          await _db.collection('users').doc(userId).update({'name': name});
+        }
         _nameCache[userId] = name;
         return name;
       }
@@ -69,7 +88,7 @@ class FirestoreService {
       print('Error fetching user name: $e');
     }
 
-    return 'Unknown User';
+    return 'User';
   }
 
   Future<void> sendMessage({
@@ -151,7 +170,9 @@ class FirestoreService {
   }
 
   // Helper to get messages formatted for LLM
-  Future<List<Map<String, dynamic>>> getMessagesForLLM(String conversationId) async {
+  Future<List<Map<String, dynamic>>> getMessagesForLLM(
+    String conversationId,
+  ) async {
     try {
       final messagesSnapshot = await _db
           .collection('conversations')
