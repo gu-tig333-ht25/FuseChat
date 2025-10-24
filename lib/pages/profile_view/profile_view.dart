@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:provider/provider.dart';
+import '/services/firestore_service.dart';
 import 'stat_card.dart';
 import 'settings_tile.dart';
 import '../../services/auth_service.dart';
@@ -15,8 +16,8 @@ class ProfileView extends StatefulWidget {
 }
 
 class _ProfileViewState extends State<ProfileView> {
-  String profileName = "?";
-  String profileEmail = "?";
+  String profileName = "User";
+  String profileEmail = "User@email.com";
   int totMsgs = 248;
   int groups = 12;
   int aiReplies = 156;
@@ -33,7 +34,7 @@ class _ProfileViewState extends State<ProfileView> {
     });
 
     // Load Firebase Auth user info
-    final currentUser = FirebaseAuth.instance.currentUser;
+    final currentUser = auth.FirebaseAuth.instance.currentUser;
     if (currentUser != null) {
       profileEmail = currentUser.email ?? profileEmail;
       profileName = currentUser.displayName ?? profileName;
@@ -48,14 +49,26 @@ class _ProfileViewState extends State<ProfileView> {
 
   @override
   Widget build(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser;
+    final user = auth.FirebaseAuth.instance.currentUser;
+    final currentUserId = auth.FirebaseAuth.instance.currentUser?.uid ?? '';
+    final firestoreService = Provider.of<FirestoreService>(context);
     ThemeSettings themeSettings = context.watch<ThemeSettings>();
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text(
-          "${user?.displayName ?? user?.email?.split('@').first ?? 'User'}'s Profile",
-          style: TextTheme.of(context).headlineLarge,
+        title: FutureBuilder<String>(
+          future: firestoreService.getUserName(currentUserId),
+          builder: (context, snapshot) {
+            final fetchedName = snapshot.data;
+            final user = auth.FirebaseAuth.instance.currentUser;
+            final displayName = fetchedName ?? user?.displayName ?? '';
+
+            return Text(
+              "$displayName's Profile",
+              style: Theme.of(context).textTheme.headlineLarge,
+            );
+          },
         ),
         actions: [
           IconButton(
@@ -66,6 +79,7 @@ class _ProfileViewState extends State<ProfileView> {
           ),
         ],
       ),
+
       body: SingleChildScrollView(
         child: Center(
           child: Column(

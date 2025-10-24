@@ -98,7 +98,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
           child: FutureBuilder<String>(
             future: firestoreService.getUserName(currentUserId),
             builder: (context, snapshot) {
-              final userName = snapshot.data ?? '?';
+              final userName = snapshot.data ?? 'User';
               return TextButton(
                 onPressed: () {
                   Navigator.of(context).push(
