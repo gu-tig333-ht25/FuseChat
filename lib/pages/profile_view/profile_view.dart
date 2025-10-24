@@ -52,13 +52,12 @@ class _ProfileViewState extends State<ProfileView> {
     final currentUserId = auth.FirebaseAuth.instance.currentUser?.uid ?? '';
     final firestoreService = Provider.of<FirestoreService>(context);
     ThemeSettings themeSettings = context.watch<ThemeSettings>();
-    final amountMsgs = FirestoreService().getAmountConversations(currentUserId);
 
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: FutureBuilder<String>(
-          future: firestoreService.getUserName(currentUserId),
+        title: StreamBuilder<String>(
+          stream: firestoreService.getUserName(currentUserId),
           builder: (context, snapshot) {
             final fetchedName = snapshot.data;
             final user = auth.FirebaseAuth.instance.currentUser;

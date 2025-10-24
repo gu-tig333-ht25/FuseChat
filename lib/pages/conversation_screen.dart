@@ -95,8 +95,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
         ),
         leading: Padding(
           padding: const EdgeInsets.fromLTRB(3, 0, 0, 0),
-          child: FutureBuilder<String>(
-            future: firestoreService.getUserName(currentUserId),
+          child: StreamBuilder<String>(
+            stream: firestoreService.getUserName(currentUserId),
             builder: (context, snapshot) {
               final userName = snapshot.data ?? 'User';
               return TextButton(

@@ -172,27 +172,31 @@ class FirestoreService {
     return User.fromFirestore(doc);
   }
 
-  Future<String> getUserName(String userId) async {
-    try {
-      final doc = await _db.collection('users').doc(userId).get();
-      if (!doc.exists) return 'User';
+  Stream<String> getUserName(String userId) {
+    return _db
+        .collection('users')
+        .doc(userId)
+        .snapshots()
+        .map((doc) {
+          if (!doc.exists) return 'User';
 
-      final data = doc.data() ?? {};
-      String name = (data['name'] ?? '').trim();
-      final email = (data['email'] ?? '').trim();
+          final data = doc.data() ?? {};
+          String name = (data['name'] ?? '').trim();
+          final email = (data['email'] ?? '').trim();
 
-      // Derive name from email if missing
-      if (name.isEmpty && email.isNotEmpty) {
-        name = email.split('@').first;
-      }
+          // Derive name from email if missing
+          if (name.isEmpty && email.isNotEmpty) {
+            name = email.split('@').first;
+          }
 
-      // Cache result
-      _nameCache[userId] = name.isNotEmpty ? name : 'User';
-      return _nameCache[userId]!;
-    } catch (e) {
-      print('Error getting user name: $e');
-      return 'User';
-    }
+          // Cache result for reuse
+          _nameCache[userId] = name.isNotEmpty ? name : 'User';
+          return _nameCache[userId]!;
+        })
+        .handleError((error) {
+          print('Error streaming user name: $error');
+          return 'User';
+        });
   }
 
   // Get conversation with messages for LLM
