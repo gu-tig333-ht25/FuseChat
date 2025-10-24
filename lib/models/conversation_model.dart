@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'user_model.dart';
 import 'message_model.dart';
 
@@ -67,4 +68,15 @@ class Conversation {
       messages: messages ?? this.messages,
     );
   }
+}
+
+class ConversationFilterState extends ChangeNotifier{
+  String _filter = "";
+
+  set filter(String filter){
+    _filter = filter;
+    notifyListeners();
+  }
+
+  String get filter => _filter;
 }
