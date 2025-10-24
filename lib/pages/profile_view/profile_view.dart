@@ -112,46 +112,55 @@ class _ProfileViewState extends State<ProfileView> {
                 ],
               ),
               Divider(thickness: 2, height: 40),
-              StreamBuilder<int>(
-                stream: firestoreService.getAmountConversations(currentUserId),
-                builder: (context, snapshot) {
-                  final groups = snapshot.data ?? 0;
+              Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    StreamBuilder<int>(
+                      stream: firestoreService.getAmountMessages(currentUserId),
+                      builder: (context, snapshot) {
+                        final messages = snapshot.data ?? 0;
 
-                  return Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Expanded(
+                        return Expanded(
                           child: StatCard(
                             icon: Icons.message_outlined,
                             color: Colors.blue,
-                            value: '$totMsgs',
+                            value: '$messages',
                             label: 'Messages',
                           ),
-                        ),
-                        SizedBox(width: 10),
-                        Expanded(
+                        );
+                      },
+                    ),
+                    SizedBox(width: 10),
+                    StreamBuilder(
+                      stream: firestoreService.getAmountConversations(
+                        currentUserId,
+                      ),
+                      builder: (context, snapshot) {
+                        final groups = snapshot.data ?? 0;
+
+                        return Expanded(
                           child: StatCard(
                             icon: Icons.group,
                             color: Colors.purpleAccent,
                             value: '$groups',
                             label: 'Groups',
                           ),
-                        ),
-                        SizedBox(width: 10),
-                        Expanded(
-                          child: StatCard(
-                            icon: Icons.stars,
-                            color: Colors.orangeAccent,
-                            value: '$aiReplies',
-                            label: 'AI Replies',
-                          ),
-                        ),
-                      ],
+                        );
+                      },
                     ),
-                  );
-                },
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: StatCard(
+                        icon: Icons.stars,
+                        color: Colors.orangeAccent,
+                        value: '$aiReplies',
+                        label: 'AI Replies',
+                      ),
+                    ),
+                  ],
+                ),
               ),
               Divider(thickness: 1, color: Colors.grey[300], height: 40),
 

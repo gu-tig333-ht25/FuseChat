@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/conversation_model.dart';
 import '../models/message_model.dart';
 import '../models/user_model.dart';
+import 'package:rxdart/rxdart.dart';
 
 class FirestoreService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -25,6 +26,26 @@ class FirestoreService {
     return getConversations(
       userId,
     ).map((conversations) => conversations.length);
+  }
+
+  Stream<int> getAmountMessages(String userId) {
+    return _db.collection('conversations').snapshots().switchMap((snapshot) {
+      final messageStreams = snapshot.docs.map((doc) {
+        return doc.reference
+            .collection('messages')
+            .where('senderId', isEqualTo: userId)
+            .snapshots()
+            .map((msgSnap) => msgSnap.docs.length);
+      }).toList();
+
+      if (messageStreams.isEmpty) {
+        return Stream.value(0);
+      }
+
+      return Rx.combineLatestList<int>(
+        messageStreams,
+      ).map((counts) => counts.fold<int>(0, (sum, count) => sum + count));
+    });
   }
 
   // Get a single conversation by ID
