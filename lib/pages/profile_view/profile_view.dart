@@ -6,50 +6,18 @@ import 'settings_tile.dart';
 import '../../services/auth_service.dart';
 import 'AI_config_view.dart';
 import '../../models/theme_model.dart';
+import '../../models/profile_model.dart';
 
-class ProfileView extends StatefulWidget {
-  const ProfileView({super.key});
 
-  @override
-  State<ProfileView> createState() => _ProfileViewState();
-}
 
-class _ProfileViewState extends State<ProfileView> {
-  String profileName = "Jane Doe";
-  String profileEmail = "jane.doe@email.com";
-  int totMsgs = 248;
-  int groups = 12;
-  int aiReplies = 156;
-  late TextEditingController _controller;
+class ProfileView extends StatelessWidget {
 
-  @override
-  void initState() {
-    super.initState();
-    _controller = TextEditingController(text: profileName);
-    _controller.addListener(() {
-      setState(() {
-        profileName = _controller.text;
-      });
-    });
-
-    // Load Firebase Auth user info
-    final currentUser = FirebaseAuth.instance.currentUser;
-    if (currentUser != null) {
-      profileEmail = currentUser.email ?? profileEmail;
-      profileName = currentUser.displayName ?? profileName;
-    }
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
     ThemeSettings themeSettings = context.watch<ThemeSettings>();
+    ProfileSettings profileSettings = context.watch<ProfileSettings>();
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -80,7 +48,7 @@ class _ProfileViewState extends State<ProfileView> {
                       CircleAvatar(
                         radius: 30,
                         child: Text(
-                          (profileEmail[0]).toUpperCase(),
+                          (profileSettings.profileEmail[0]).toUpperCase(),
                           style: Theme.of(
                             context,
                           ).textTheme.titleLarge?.copyWith(fontSize: 22),
@@ -88,7 +56,7 @@ class _ProfileViewState extends State<ProfileView> {
                       ),
                       const SizedBox(height: 20),
                       Text(
-                        profileEmail,
+                        profileSettings.profileEmail,
                         style: TextTheme.of(context).titleLarge,
                       ),
                     ],
@@ -105,7 +73,7 @@ class _ProfileViewState extends State<ProfileView> {
                       child: StatCard(
                         icon: Icons.message_outlined,
                         color: Colors.blue,
-                        value: '$totMsgs',
+                        value: '${profileSettings.totMsgs}',
                         label: 'Messages',
                       ),
                     ),
@@ -114,7 +82,7 @@ class _ProfileViewState extends State<ProfileView> {
                       child: StatCard(
                         icon: Icons.group,
                         color: Colors.purpleAccent,
-                        value: '$groups',
+                        value: '${profileSettings.groups}',
                         label: 'Groups',
                       ),
                     ),
@@ -123,7 +91,7 @@ class _ProfileViewState extends State<ProfileView> {
                       child: StatCard(
                         icon: Icons.stars,
                         color: Colors.orangeAccent,
-                        value: '$aiReplies',
+                        value: '${profileSettings.aiReplies}',
                         label: 'AI Replies',
                       ),
                     ),

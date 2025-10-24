@@ -7,6 +7,7 @@ import 'services/auth_service.dart';
 import 'services/auth_wrapper.dart';
 import 'services/firestore_service.dart';
 import 'models/theme_model.dart';
+import 'models/profile_model.dart';
 
 import 'models/AI_model.dart';
 
@@ -30,6 +31,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => MyAuthProvider()),
         Provider<FirestoreService>(create: (_) => FirestoreService()),
         ChangeNotifierProvider(create: (_) => ChatbotLastPrompts()),
+        ChangeNotifierProvider(create:(_) => ProfileSettings(),)
       ],
       child: MyApp(),
     ),
