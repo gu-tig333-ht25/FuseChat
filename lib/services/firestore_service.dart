@@ -172,6 +172,16 @@ class FirestoreService {
     return User.fromFirestore(doc);
   }
 
+  Future<bool> setUsername(String userId, String newName) async {
+    try {
+      await _db.collection('users').doc(userId).update({'name': newName});
+      return true;
+    } catch (e) {
+      print('Error updating username: $e');
+      return false;
+    }
+  }
+
   Stream<String> getUserName(String userId) {
     return _db
         .collection('users')
