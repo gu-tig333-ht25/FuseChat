@@ -15,8 +15,8 @@ class ProfileView extends StatefulWidget {
 }
 
 class _ProfileViewState extends State<ProfileView> {
-  String profileName = "Jane Doe";
-  String profileEmail = "jane.doe@email.com";
+  String profileName = "?";
+  String profileEmail = "?";
   int totMsgs = 248;
   int groups = 12;
   int aiReplies = 156;
@@ -80,7 +80,7 @@ class _ProfileViewState extends State<ProfileView> {
                       CircleAvatar(
                         radius: 30,
                         child: Text(
-                          (profileEmail[0]).toUpperCase(),
+                          (profileName[0]).toUpperCase(),
                           style: Theme.of(
                             context,
                           ).textTheme.titleLarge?.copyWith(fontSize: 22),
