@@ -20,6 +20,13 @@ class FirestoreService {
         );
   }
 
+  // get amount of conversations
+  Stream<int> getAmountConversations(String userId) {
+    return getConversations(
+      userId,
+    ).map((conversations) => conversations.length);
+  }
+
   // Get a single conversation by ID
   Future<Conversation?> getConversation(String conversationId) async {
     try {
