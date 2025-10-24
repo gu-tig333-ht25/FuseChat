@@ -29,6 +29,7 @@ void main() async {
         ),
         ChangeNotifierProvider(create: (_) => MyAuthProvider()),
         Provider<FirestoreService>(create: (_) => FirestoreService()),
+        ChangeNotifierProvider(create: (_) => ChatbotLastPrompts()),
       ],
       child: MyApp(),
     ),

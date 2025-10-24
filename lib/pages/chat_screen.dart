@@ -28,7 +28,6 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   final messageTextController = TextEditingController();
   final FocusNode messageFocusNode = FocusNode();
-  String? _lastSuggestion;
 
   @override
   void dispose() {
@@ -71,13 +70,21 @@ class _ChatScreenState extends State<ChatScreen> {
               child: InkWell(
                 onTap: () {
                   // If we have a last suggestion from the LLM, copy it into the input
-                  if (_lastSuggestion != null &&
-                      _lastSuggestion!.trim().isNotEmpty) {
-                    messageTextController.text = _lastSuggestion!;
+                  String? response = context.read<ChatbotLastPrompts>().getResponse(widget.conversationId)?.responses;
+                  if (response != null && response.trim() != "") {
+                    context.read<ChatbotLastPrompts>().getResponse(
+                      widget.conversationId,
+                    );
+                    messageTextController.text = response;
                     messageTextController.selection = TextSelection.collapsed(
                       offset: messageTextController.text.length,
                     );
                     messageFocusNode.requestFocus();
+                  } else {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => AIConfig()),
+                    );
                   }
                 },
                 child: Padding(
@@ -87,9 +94,6 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                   child: AISuggestionBoxWrapper(
                     conversationId: widget.conversationId,
-                    onSuggestionAvailable: (String? suggestion) {
-                      _lastSuggestion = suggestion;
-                    },
                   ),
                 ),
               ),
@@ -140,13 +144,8 @@ class _ChatScreenState extends State<ChatScreen> {
 
 class AISuggestionBoxWrapper extends StatelessWidget {
   final String conversationId;
-  final void Function(String?)? onSuggestionAvailable;
 
-  const AISuggestionBoxWrapper({
-    super.key,
-    required this.conversationId,
-    this.onSuggestionAvailable,
-  });
+  const AISuggestionBoxWrapper({super.key, required this.conversationId});
 
   @override
   Widget build(BuildContext context) {
@@ -175,7 +174,6 @@ class AISuggestionBoxWrapper extends StatelessWidget {
         return AISuggestionBox(
           conversationId: conversationId,
           messages: conversation.messages,
-          onSuggestionAvailable: onSuggestionAvailable,
         );
       },
     );
@@ -311,7 +309,7 @@ class MessageBubble extends StatelessWidget {
       );
     }
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -327,10 +325,7 @@ class MessageBubble extends StatelessWidget {
             : CrossAxisAlignment.start,
         children: <Widget>[
           if (!isMe && previousSenderID != senderID)
-            Text(
-              senderName,
-              style: TextTheme.of(context).labelSmall,
-            ),
+            Text(senderName, style: TextTheme.of(context).labelSmall),
           Row(
             mainAxisAlignment: isMe
                 ? MainAxisAlignment.end
@@ -404,12 +399,10 @@ class MessageBubble extends StatelessWidget {
 class AISuggestionBox extends StatelessWidget {
   final String conversationId;
   final List<Message> messages;
-  final void Function(String?)? onSuggestionAvailable;
 
   const AISuggestionBox({
     required this.conversationId,
     required this.messages,
-    this.onSuggestionAvailable,
     super.key,
   });
 
@@ -488,12 +481,10 @@ class AISuggestionBox extends StatelessWidget {
                 promptResponse.stopReason ??
                 "Empty ChatBot Response";
 
-            // Notify parent that a suggestion is available
-            if (onSuggestionAvailable != null) {
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                onSuggestionAvailable!(suggestionText);
-              });
-            }
+            context.read<ChatbotLastPrompts>().setResponse(
+              conversationId,
+              promptResponse,
+            );
 
             // Make suggestion tappable: when tapped, call the provided callback
             return Text(suggestionText);
