@@ -54,7 +54,7 @@ class _ProfileSettingsState extends State<ProfileSettings> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text("Nickname updated successfully!"),
-          backgroundColor: Theme.of(context).colorScheme.error,
+          backgroundColor: Theme.of(context).colorScheme.primary,
           behavior: SnackBarBehavior.floating,
         ),
       );
