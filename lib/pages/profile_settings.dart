@@ -4,14 +4,14 @@ import '/services/firestore_service.dart';
 import 'package:provider/provider.dart';
 import 'package:template/theme/themedata.dart';
 
-class ProfileSettings extends StatefulWidget {
-  ProfileSettings({super.key});
+class ProfileSettingsView extends StatefulWidget {
+  ProfileSettingsView({super.key});
 
   @override
-  State<ProfileSettings> createState() => _ProfileSettingsState();
+  State<ProfileSettingsView> createState() => _ProfileSettingsViewState();
 }
 
-class _ProfileSettingsState extends State<ProfileSettings> {
+class _ProfileSettingsViewState extends State<ProfileSettingsView> {
   final TextEditingController _chatNameController = TextEditingController();
 
   @override
