@@ -186,23 +186,6 @@ class _ProfileViewState extends State<ProfileView> {
                       );
                     },
                   ),
-
-                  SettingsTile(
-                    icon: Icons.notifications_none,
-                    label: "Notifications",
-                    actionText: "View",
-                    onTap: () {
-                      // TODO: navigator.push()
-                    },
-                  ),
-                  SettingsTile(
-                    icon: Icons.lock_outline,
-                    label: "Privacy",
-                    actionText: "Manage",
-                    onTap: () {
-                      // TODO: navigator.push()
-                    },
-                  ),
                   SettingsTile(
                     icon: Icons.logout,
                     label: "Logout",
