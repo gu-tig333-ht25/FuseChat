@@ -19,8 +19,6 @@ class ProfileView extends StatefulWidget {
 class _ProfileViewState extends State<ProfileView> {
   String profileName = "User";
   String profileEmail = "User@email.com";
-  int totMsgs = 248;
-  int aiReplies = 156;
   late TextEditingController _controller;
 
   @override
@@ -149,15 +147,6 @@ class _ProfileViewState extends State<ProfileView> {
                         );
                       },
                     ),
-                    SizedBox(width: 10),
-                    Expanded(
-                      child: StatCard(
-                        icon: Icons.stars,
-                        color: Colors.orangeAccent,
-                        value: '$aiReplies',
-                        label: 'AI Replies',
-                      ),
-                    ),
                   ],
                 ),
               ),
@@ -195,23 +184,6 @@ class _ProfileViewState extends State<ProfileView> {
                         context,
                         MaterialPageRoute(builder: (context) => AIConfig()),
                       );
-                    },
-                  ),
-
-                  SettingsTile(
-                    icon: Icons.notifications_none,
-                    label: "Notifications",
-                    actionText: "View",
-                    onTap: () {
-                      // TODO: navigator.push()
-                    },
-                  ),
-                  SettingsTile(
-                    icon: Icons.lock_outline,
-                    label: "Privacy",
-                    actionText: "Manage",
-                    onTap: () {
-                      // TODO: navigator.push()
                     },
                   ),
                   SettingsTile(
