@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:provider/provider.dart';
+import '/services/firestore_service.dart';
 import 'stat_card.dart';
 import 'settings_tile.dart';
 import '../../services/auth_service.dart';
@@ -15,25 +16,38 @@ class ProfileView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser;
+    final currentUserId = auth.FirebaseAuth.instance.currentUser?.uid ?? '';
+    final firestoreService = Provider.of<FirestoreService>(context);
     ThemeSettings themeSettings = context.watch<ThemeSettings>();
     ProfileSettings profileSettings = context.watch<ProfileSettings>();
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text(
-          "${user?.displayName ?? user?.email?.split('@').first ?? 'User'}'s Profile",
-          style: TextTheme.of(context).headlineLarge,
+        title: StreamBuilder<String>(
+          stream: firestoreService.getUserName(currentUserId),
+          builder: (context, snapshot) {
+            final fetchedName = snapshot.data;
+            final user = auth.FirebaseAuth.instance.currentUser;
+            final displayName = fetchedName ?? user?.displayName ?? '';
+
+            return Text(
+              "$displayName's Profile",
+              style: Theme.of(context).textTheme.headlineLarge,
+            );
+          },
         ),
         actions: [
           IconButton(
             icon: const Icon(Icons.settings, color: Colors.white),
             onPressed: () {
-              // TODO: navigator.push(ProfileSettings)
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => ProfileSettings()),
+              );
             },
           ),
         ],
       ),
+
       body: SingleChildScrollView(
         child: Center(
           child: Column(
@@ -69,22 +83,38 @@ class ProfileView extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    Expanded(
-                      child: StatCard(
-                        icon: Icons.message_outlined,
-                        color: Colors.blue,
-                        value: '${profileSettings.totMsgs}',
-                        label: 'Messages',
-                      ),
+                    StreamBuilder<int>(
+                      stream: firestoreService.getAmountMessages(currentUserId),
+                      builder: (context, snapshot) {
+                        final messages = snapshot.data ?? 0;
+
+                        return Expanded(
+                          child: StatCard(
+                            icon: Icons.message_outlined,
+                            color: Colors.blue,
+                            value: '$messages',
+                            label: 'Messages',
+                          ),
+                        );
+                      },
                     ),
                     SizedBox(width: 10),
-                    Expanded(
-                      child: StatCard(
-                        icon: Icons.group,
-                        color: Colors.purpleAccent,
-                        value: '${profileSettings.groups}',
-                        label: 'Groups',
+                    StreamBuilder(
+                      stream: firestoreService.getAmountConversations(
+                        currentUserId,
                       ),
+                      builder: (context, snapshot) {
+                        final groups = snapshot.data ?? 0;
+
+                        return Expanded(
+                          child: StatCard(
+                            icon: Icons.group,
+                            color: Colors.purpleAccent,
+                            value: '$groups',
+                            label: 'Groups',
+                          ),
+                        );
+                      },
                     ),
                     SizedBox(width: 10),
                     Expanded(

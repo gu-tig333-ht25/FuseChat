@@ -78,16 +78,36 @@ class ConversationScreen extends StatelessWidget {
             textStyle: Theme.of(context).textTheme.displayMedium,
           ),
         ),
-        leading: IconButton(
-          color: Theme.of(context).colorScheme.secondary,
-          onPressed: () {
-            Navigator.of(
-              context,
-            ).push(MaterialPageRoute(builder: (context) => ProfileView()));
-          },
-          icon: Icon(Icons.person),
-          iconSize: 50,
-          tooltip: 'Profile',
+        leading: Padding(
+          padding: const EdgeInsets.fromLTRB(3, 0, 0, 0),
+          child: StreamBuilder<String>(
+            stream: firestoreService.getUserName(currentUserId),
+            builder: (context, snapshot) {
+              final userName = snapshot.data ?? 'User';
+              return TextButton(
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => ProfileView()),
+                  );
+                },
+                style: TextButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  padding: EdgeInsets.zero,
+                ),
+                child: CircleAvatar(
+                  radius: 20,
+                  child: Text(
+                    userName[0].toUpperCase(),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodyLarge?.copyWith(fontSize: 23),
+                  ),
+                ),
+              );
+            },
+          ),
         ),
       ),
       body: Center(

@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/conversation_model.dart';
 import '../models/message_model.dart';
 import '../models/user_model.dart';
+import 'package:rxdart/rxdart.dart';
 
 class FirestoreService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -18,6 +19,33 @@ class FirestoreService {
               .map((doc) => Conversation.fromFirestore(doc))
               .toList(),
         );
+  }
+
+  // get amount of conversations
+  Stream<int> getAmountConversations(String userId) {
+    return getConversations(
+      userId,
+    ).map((conversations) => conversations.length);
+  }
+
+  Stream<int> getAmountMessages(String userId) {
+    return _db.collection('conversations').snapshots().switchMap((snapshot) {
+      final messageStreams = snapshot.docs.map((doc) {
+        return doc.reference
+            .collection('messages')
+            .where('senderId', isEqualTo: userId)
+            .snapshots()
+            .map((msgSnap) => msgSnap.docs.length);
+      }).toList();
+
+      if (messageStreams.isEmpty) {
+        return Stream.value(0);
+      }
+
+      return Rx.combineLatestList<int>(
+        messageStreams,
+      ).map((counts) => counts.fold<int>(0, (sum, count) => sum + count));
+    });
   }
 
   // Get a single conversation by ID
@@ -142,6 +170,43 @@ class FirestoreService {
   Future<User> getUser(String userId) async {
     final doc = await _db.collection('users').doc(userId).get();
     return User.fromFirestore(doc);
+  }
+
+  Future<bool> setUsername(String userId, String newName) async {
+    try {
+      await _db.collection('users').doc(userId).update({'name': newName});
+      return true;
+    } catch (e) {
+      print('Error updating username: $e');
+      return false;
+    }
+  }
+
+  Stream<String> getUserName(String userId) {
+    return _db
+        .collection('users')
+        .doc(userId)
+        .snapshots()
+        .map((doc) {
+          if (!doc.exists) return 'User';
+
+          final data = doc.data() ?? {};
+          String name = (data['name'] ?? '').trim();
+          final email = (data['email'] ?? '').trim();
+
+          // Derive name from email if missing
+          if (name.isEmpty && email.isNotEmpty) {
+            name = email.split('@').first;
+          }
+
+          // Cache result for reuse
+          _nameCache[userId] = name.isNotEmpty ? name : 'User';
+          return _nameCache[userId]!;
+        })
+        .handleError((error) {
+          print('Error streaming user name: $error');
+          return 'User';
+        });
   }
 
   // Get conversation with messages for LLM
