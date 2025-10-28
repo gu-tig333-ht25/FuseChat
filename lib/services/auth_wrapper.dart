@@ -20,7 +20,7 @@ class AuthWrapper extends StatelessWidget {
     // ConversationScreen is the "default" page that is navigated to after a user is logged in.
     // Could cause issues if the firebase-user is edited but not logged out. Idk.
     if (auth.isLoggedIn) {
-      return const ConversationScreen();
+      return ConversationScreen();
     } else {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (Navigator.of(context).canPop()) {

@@ -8,17 +8,9 @@ import 'chat_screen.dart';
 import 'profile_view/profile_view.dart';
 import 'package:template/theme/themedata.dart';
 
-class ConversationScreen extends StatefulWidget {
-  const ConversationScreen({super.key});
-
-  @override
-  State<ConversationScreen> createState() => _ConversationScreenState();
-}
-
-class _ConversationScreenState extends State<ConversationScreen> {
-  String _searchText = '';
+class ConversationScreen extends StatelessWidget {
   final TextEditingController _chatNameController = TextEditingController();
-
+  ConversationScreen({super.key});
   Future<void> createChatDialog(BuildContext context) {
     final firestoreService = Provider.of<FirestoreService>(
       context,
@@ -75,16 +67,9 @@ class _ConversationScreenState extends State<ConversationScreen> {
   }
 
   @override
-  void dispose() {
-    _chatNameController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(context) {
     final currentUserId = auth.FirebaseAuth.instance.currentUser?.uid ?? '';
     final firestoreService = Provider.of<FirestoreService>(context);
-
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -149,9 +134,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                 leading: Icon(Icons.menu),
                 trailing: [Icon(Icons.search)],
                 onChanged: (value) {
-                  setState(() {
-                    _searchText = value;
-                  });
+                  context.read<ConversationFilterState>().filter = value;
                 },
               ),
             ),
@@ -167,57 +150,68 @@ class _ConversationScreenState extends State<ConversationScreen> {
                     return const Center(child: Text('No conversations yet'));
                   }
 
-                  final conversations = snapshot.data!;
-                  print(TextTheme.of(context).titleMedium?.color);
-                  return ListView.builder(
-                    itemCount: conversations.length,
-                    itemBuilder: (context, index) {
-                      final conv = conversations[index];
-                      return Card(
-                        margin: EdgeInsets.all(2),
-                        child: ListTile(
-                          leading: CircleAvatar(
-                            backgroundColor:
-                                conversationBubbleColors[index %
-                                    conversationBubbleColors.length],
-                            child: Text(
-                              conv.name.isNotEmpty
-                                  ? conv.name[0].toUpperCase()
-                                  : 'C',
-                              style: TextTheme.of(context).titleMedium
-                                  ?.copyWith(fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                          title: Text(
-                            conv.name,
-                            style: TextTheme.of(context).titleMedium,
-                          ),
-                          subtitle: Text(
-                            conv.lastMessage,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextTheme.of(context).labelLarge?.copyWith(
-                              color: TextTheme.of(
-                                context,
-                              ).labelLarge?.color?.withValues(alpha: 0.5),
-                            ),
-                          ),
-                          trailing: conv.lastMessageTime != null
-                              ? Text(
-                                  '${conv.lastMessageTime!.hour}:${conv.lastMessageTime!.minute.toString().padLeft(2, '0')}',
-                                )
-                              : null,
-                          onTap: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => ChatScreen(
-                                  conversationId: conv.id,
-                                  chatTitle: conv.name,
+                  return Selector<ConversationFilterState, List<Conversation>>(
+                    selector: (BuildContext p1, ConversationFilterState p2) =>
+                        snapshot.data!
+                            .where((c) => c.name.toLowerCase().contains(RegExp(p2.filter.toLowerCase())))
+                            .toList(),
+                    shouldRebuild: (previous, next) =>
+                        (previous.length != next.length) ||
+                        previous.every((element) => next.contains(element)),
+                    builder: (_, conversations, _) {
+                      return ListView.builder(
+                        itemCount: conversations.length,
+                        itemBuilder: (context, index) {
+                          final conv = conversations[index];
+                          return Card(
+                            margin: EdgeInsets.all(2),
+                            child: ListTile(
+                              leading: CircleAvatar(
+                                backgroundColor:
+                                    conversationBubbleColors[index %
+                                        conversationBubbleColors.length],
+                                child: Text(
+                                  conv.name.isNotEmpty
+                                      ? conv.name[0].toUpperCase()
+                                      : 'C',
+                                  style: TextTheme.of(context).titleMedium
+                                      ?.copyWith(fontWeight: FontWeight.bold),
                                 ),
                               ),
-                            );
-                          },
-                        ),
+                              title: Text(
+                                conv.name,
+                                style: TextTheme.of(context).titleMedium,
+                              ),
+                              subtitle: Text(
+                                conv.lastMessage,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextTheme.of(context).labelLarge
+                                    ?.copyWith(
+                                      color: TextTheme.of(context)
+                                          .labelLarge
+                                          ?.color
+                                          ?.withValues(alpha: 0.5),
+                                    ),
+                              ),
+                              trailing: conv.lastMessageTime != null
+                                  ? Text(
+                                      '${conv.lastMessageTime!.hour}:${conv.lastMessageTime!.minute.toString().padLeft(2, '0')}',
+                                    )
+                                  : null,
+                              onTap: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) => ChatScreen(
+                                      conversationId: conv.id,
+                                      chatTitle: conv.name,
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          );
+                        },
                       );
                     },
                   );

@@ -159,3 +159,17 @@ class Personality {
     );
   }
 }
+
+class ChatbotLastPrompts extends ChangeNotifier{
+  final Map<String, PromptResponse> _responses =  {};
+
+  PromptResponse? getResponse(String id) => _responses.containsKey(id) ? _responses[id] : null;
+
+  void setResponse(String id, PromptResponse response){
+    if(_responses[id] != response){
+      _responses[id] = response;
+      notifyListeners();
+    }
+  }
+
+}

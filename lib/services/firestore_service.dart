@@ -167,10 +167,11 @@ class FirestoreService {
     return convRef.id;
   }
 
-  Future<User> getUser(String userId) async {
-    final doc = await _db.collection('users').doc(userId).get();
-    return User.fromFirestore(doc);
-  }
+  Stream<User> getUser(String userId) => _db
+      .collection('users')
+      .doc(userId)
+      .snapshots()
+      .map((event) => User.fromFirestore(event));
 
   Future<bool> setUsername(String userId, String newName) async {
     try {
