@@ -211,29 +211,49 @@ class FirestoreService {
   }
 
   // Get conversation with messages for LLM
-  Future<Conversation?> getConversationForLLM(String conversationId) async {
-    try {
-      final conversation = await getConversation(conversationId);
-      if (conversation == null) return null;
+ Stream<Conversation?> getConversationForLLM(String conversationId) async* {
+  try {
+    // First, get a stream of the conversation document itself
+    final conversationDocStream = _db
+        .collection('conversations')
+        .doc(conversationId)
+        .snapshots();
 
-      final messagesSnapshot = await _db
+    // Then, for each conversation snapshot, combine it with its message stream
+    await for (final conversationSnapshot in conversationDocStream) {
+      if (!conversationSnapshot.exists) {
+        yield null;
+        continue;
+      }
+
+      // Build the Conversation object (you probably already have a fromFirestore)
+      final conversation = Conversation.fromFirestore(conversationSnapshot);
+
+      // Now, stream the messages
+      final messagesStream = _db
           .collection('conversations')
           .doc(conversationId)
           .collection('messages')
           .orderBy('timestamp')
-          .get();
+          .snapshots()
+          .map((messagesSnapshot) {
+            final messages = messagesSnapshot.docs
+                .map((doc) => Message.fromFirestore(doc))
+                .toList();
 
-      final messages = messagesSnapshot.docs
-          .map((doc) => Message.fromFirestore(doc))
-          .toList();
+            // Return the conversation updated with messages
+            return conversation.copyWith(messages: messages);
+          });
 
-      // Use copyWith to add messages to existing conversation
-      return conversation.copyWith(messages: messages);
-    } catch (e) {
-      print('Error getting conversation for LLM: $e');
-      return null;
+      // Yield the messagesStream so we continue listening
+      yield* messagesStream;
     }
+  } catch (e) {
+    print('Error streaming conversation for LLM: $e');
+    yield null;
   }
+}
+
 
   // Helper to get messages formatted for LLM
   Future<List<Map<String, dynamic>>> getMessagesForLLM(
