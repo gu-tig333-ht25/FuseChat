@@ -78,6 +78,7 @@ class _AuthScreenState extends State<AuthScreen> {
           child: Form(
             key: _formKey,
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const Spacer(),
                 Text('FuseChat', style: theme.textTheme.displayLarge),
@@ -115,8 +116,6 @@ class _AuthScreenState extends State<AuthScreen> {
                 Consumer<MyAuthProvider>(
                   builder: (context, auth, child) {
                     return SizedBox(
-                      width: double.infinity,
-                      height: 50,
                       child: ElevatedButton(
                         style: ButtonStyle(
                           backgroundColor: WidgetStatePropertyAll(
