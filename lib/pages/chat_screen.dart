@@ -70,7 +70,10 @@ class _ChatScreenState extends State<ChatScreen> {
               child: InkWell(
                 onTap: () {
                   // If we have a last suggestion from the LLM, copy it into the input
-                  String? response = context.read<ChatbotLastPrompts>().getResponse(widget.conversationId)?.responses;
+                  String? response = context
+                      .read<ChatbotLastPrompts>()
+                      .getResponse(widget.conversationId)
+                      ?.responses;
                   if (response != null && response.trim() != "") {
                     context.read<ChatbotLastPrompts>().getResponse(
                       widget.conversationId,
@@ -154,8 +157,8 @@ class AISuggestionBoxWrapper extends StatelessWidget {
       listen: false,
     );
 
-    return FutureBuilder<Conversation?>(
-      future: firestoreService.getConversationForLLM(conversationId),
+    return StreamBuilder<Conversation?>(
+      stream: firestoreService.getConversationForLLM(conversationId),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const CircularProgressIndicator();
@@ -213,6 +216,7 @@ class MessagesStream extends StatelessWidget {
 
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (listScrollController.hasClients) {
+            print("jump");
             listScrollController.jumpTo(
               listScrollController.position.maxScrollExtent,
             );
@@ -481,10 +485,12 @@ class AISuggestionBox extends StatelessWidget {
                 promptResponse.stopReason ??
                 "Empty ChatBot Response";
 
-            context.read<ChatbotLastPrompts>().setResponse(
-              conversationId,
-              promptResponse,
-            );
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              context.read<ChatbotLastPrompts>().setResponse(
+                conversationId,
+                promptResponse,
+              );
+            });
 
             // Make suggestion tappable: when tapped, call the provided callback
             return Text(suggestionText);

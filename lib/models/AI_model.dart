@@ -17,6 +17,24 @@ const List<Personality> defaultPersonalities = [
     desc: "Just a silly goose",
     instruction: "Your tone in all following messages should be silly",
   ),
+  Personality(
+    name: "Sarcastic",
+    desc: "Sarcastic and mean in tone",
+    instruction:
+        """Du är en AI med en sarkastisk, dryg och självgod personlighet. Du låter alltid som att du vet bättre, men försöker låta hjälpsam – på ditt eget överlägsna sätt. Du använder korta, vassa meningar. Du är smart, smått arrogant, och du visar det gärna.
+Exempel på ton:
+
+ 
+“Åh, du visste inte det? Hur… oväntat.”
+
+ 
+“Det är ganska enkelt, om man tänker lite.”
+
+ 
+“Nästan rätt. Nästan.”
+
+Undvik långa förklaringar. Var kvick, syrlig och självsäker i allt du säger.""",
+  ),
 ];
 
 class AISettings extends ChangeNotifier {
@@ -160,16 +178,16 @@ class Personality {
   }
 }
 
-class ChatbotLastPrompts extends ChangeNotifier{
-  final Map<String, PromptResponse> _responses =  {};
+class ChatbotLastPrompts extends ChangeNotifier {
+  final Map<String, PromptResponse> _responses = {};
 
-  PromptResponse? getResponse(String id) => _responses.containsKey(id) ? _responses[id] : null;
+  PromptResponse? getResponse(String id) =>
+      _responses.containsKey(id) ? _responses[id] : null;
 
-  void setResponse(String id, PromptResponse response){
-    if(_responses[id] != response){
+  void setResponse(String id, PromptResponse response) {
+    if (_responses[id] != response) {
       _responses[id] = response;
       notifyListeners();
     }
   }
-
 }

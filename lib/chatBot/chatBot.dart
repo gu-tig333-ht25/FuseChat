@@ -99,7 +99,7 @@ class Gemeni implements Promptable {
     Candidates? candidates = await Gemini.instance.chat(
       contentChat,
       generationConfig: GenerationConfig(
-        maxOutputTokens: 5000,
+        maxOutputTokens: 2500,
         temperature: 0.9,
       ),
       systemPrompt: systemPrompt,

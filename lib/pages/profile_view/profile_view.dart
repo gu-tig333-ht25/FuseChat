@@ -122,15 +122,6 @@ class ProfileView extends StatelessWidget {
                               );
                             },
                           ),
-                          SizedBox(width: 10),
-                          Expanded(
-                            child: StatCard(
-                              icon: Icons.stars,
-                              color: Colors.orangeAccent,
-                              value: '${123}',
-                              label: 'AI Replies',
-                            ),
-                          ),
                         ],
                       ),
                     ),
@@ -182,22 +173,6 @@ class ProfileView extends StatelessWidget {
                           },
                         ),
 
-                        SettingsTile(
-                          icon: Icons.notifications_none,
-                          label: "Notifications",
-                          actionText: "View",
-                          onTap: () {
-                            // TODO: navigator.push()
-                          },
-                        ),
-                        SettingsTile(
-                          icon: Icons.lock_outline,
-                          label: "Privacy",
-                          actionText: "Manage",
-                          onTap: () {
-                            // TODO: navigator.push()
-                          },
-                        ),
                         SettingsTile(
                           icon: Icons.logout,
                           label: "Logout",

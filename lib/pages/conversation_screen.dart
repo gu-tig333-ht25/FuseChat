@@ -134,6 +134,7 @@ class ConversationScreen extends StatelessWidget {
                 leading: Icon(Icons.menu),
                 trailing: [Icon(Icons.search)],
                 onChanged: (value) {
+                  
                   context.read<ConversationFilterState>().filter = value;
                 },
               ),
