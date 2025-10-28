@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import '/services/firestore_service.dart';
 import 'package:provider/provider.dart';
-import 'package:template/theme/themedata.dart';
 
 class ProfileSettingsView extends StatefulWidget {
   ProfileSettingsView({super.key});

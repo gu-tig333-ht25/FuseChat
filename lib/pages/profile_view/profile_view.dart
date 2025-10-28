@@ -11,6 +11,8 @@ import '../profile_settings.dart';
 import '../../models/user_model.dart';
 
 class ProfileView extends StatelessWidget {
+  const ProfileView({super.key});
+
   @override
   Widget build(BuildContext context) {
     final currentUserId = auth.FirebaseAuth.instance.currentUser?.uid ?? '';
@@ -97,7 +99,7 @@ class ProfileView extends StatelessWidget {
                                     ? StatCard(
                                         icon: Icons.message_outlined,
                                         color: Colors.blue,
-                                        value: '${messages}',
+                                        value: '$messages',
                                         label: 'Messages',
                                       )
                                     : Spacer(),
