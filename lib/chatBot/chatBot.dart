@@ -26,7 +26,10 @@ Like this:
   Good
 Not like this:
   ${formatUserMessage(user, "Good")}
+
 Always give a text answer as if you are sending another message.
+
+Give short answers in less than 4 medium sentence and in 1 paragraph.
   """;
 }
 
@@ -99,8 +102,7 @@ class Gemeni implements Promptable {
     Candidates? candidates = await Gemini.instance.chat(
       contentChat,
       generationConfig: GenerationConfig(
-        maxOutputTokens: 2500,
-        temperature: 0.9,
+        maxOutputTokens: 1000,
       ),
       systemPrompt: systemPrompt,
     );
