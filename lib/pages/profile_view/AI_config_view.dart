@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:template/models/AI_model.dart';
+import 'package:template/models/ai_model.dart';
 import 'package:flutter/gestures.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -15,13 +15,15 @@ class _AIConfigState extends State<AIConfig> {
   final TextEditingController _controller = TextEditingController();
   final TapGestureRecognizer _linkRecognizer = TapGestureRecognizer();
 
-  Future<void> _openLink(String url) async {
+  Future<void> _openLink(String url, BuildContext context) async {
     final uri = Uri.parse(url);
     if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
       // fallback / error handling
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Could not open link')));
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Could not open link')));
+      }
     }
   }
 
@@ -29,7 +31,7 @@ class _AIConfigState extends State<AIConfig> {
   void initState() {
     super.initState();
     _linkRecognizer.onTap = () =>
-        _openLink("https://aistudio.google.com/app/api-keys");
+        _openLink("https://aistudio.google.com/app/api-keys", context);
   }
 
   @override
@@ -42,7 +44,7 @@ class _AIConfigState extends State<AIConfig> {
   @override
   Widget build(BuildContext context) {
     AISettings settings = context.watch<AISettings>();
-    _controller.text = settings.api_key ?? "";
+    _controller.text = settings.apiKey ?? "";
 
     return Scaffold(
       appBar: AppBar(title: Text("AI settings")),
@@ -66,17 +68,21 @@ class _AIConfigState extends State<AIConfig> {
                     child: OutlinedButton(
                       style: ButtonStyle(
                         backgroundColor: WidgetStateProperty.all(
-                          settings.api_key == null ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.secondary,
+                          settings.apiKey == null
+                              ? Theme.of(context).colorScheme.primary
+                              : Theme.of(context).colorScheme.secondary,
                         ),
                         shadowColor: WidgetStateProperty.all(
                           Theme.of(context).colorScheme.onSurface,
                         ),
-
                       ),
                       onPressed: () {
-                        settings.api_key = _controller.text;
+                        settings.apiKey = _controller.text;
                       },
-                      child: Text("OK", style: TextTheme.of(context).labelLarge,),
+                      child: Text(
+                        "OK",
+                        style: TextTheme.of(context).labelLarge,
+                      ),
                     ),
                   ),
                 ],
@@ -112,12 +118,12 @@ class _AIConfigState extends State<AIConfig> {
                 },
               ),
 
-              if (settings.api_key != null)
+              if (settings.apiKey != null)
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   child: const Divider(thickness: 1),
                 ),
-              if (settings.api_key != null)
+              if (settings.apiKey != null)
                 Row(
                   children: [
                     Column(
@@ -136,10 +142,10 @@ class _AIConfigState extends State<AIConfig> {
                     Spacer(),
                     Switch(
                       inactiveTrackColor: Theme.of(context).colorScheme.primary,
-                     activeTrackColor: Theme.of(context).colorScheme.secondary,
+                      activeTrackColor: Theme.of(context).colorScheme.secondary,
                       value: settings.aiSuggestionsEnabled,
                       onChanged: (value) {
-                        print("set toggle $value");
+                        //print("set toggle $value");
                         settings.aiSuggestionsEnabled = value;
                       },
                     ),
@@ -149,7 +155,7 @@ class _AIConfigState extends State<AIConfig> {
                 padding: const EdgeInsets.symmetric(vertical: 10),
                 child: const Divider(thickness: 1),
               ),
-              if (settings.aiSuggestionsEnabled && settings.api_key != null)
+              if (settings.aiSuggestionsEnabled && settings.apiKey != null)
                 Expanded(
                   child: ListView.builder(
                     itemCount: settings.personalities.length,

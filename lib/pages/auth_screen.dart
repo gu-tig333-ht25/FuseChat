@@ -169,7 +169,7 @@ class _AuthScreenState extends State<AuthScreen> {
                         ).colorScheme.secondary,
                         value: themeSettings.isDarkMode,
                         onChanged: (value) {
-                          print("set toggle $value");
+                          //print("set toggle $value");
                           themeSettings.isDarkMode = value;
                         },
                       ),

@@ -63,7 +63,7 @@ Future<PromptResponse> prompt({
   String userMessage = "";
 
   for (var m in chat) {
-    final messageSender = m.senderName ?? m.senderId;
+    final messageSender = m.senderName;
     
     if (m.aiGenerated && messageSender == user) {
       if (userMessage != "") {

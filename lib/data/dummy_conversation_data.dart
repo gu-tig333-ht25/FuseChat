@@ -6,7 +6,7 @@ class FirestoreInitializer {
     final batch = db.batch();
 
     try {
-      print('Starting Firestore initialization...');
+      //print('Starting Firestore initialization...');
 
       // Add all users to the users collection
       final users = [
@@ -32,7 +32,7 @@ class FirestoreInitializer {
       }
 
       await batch.commit();
-      print('Users added');
+      //print('Users added');
 
       // Add conversations with messages
       final conversations = [
@@ -106,12 +106,12 @@ class FirestoreInitializer {
           });
         }
 
-        print('Conversation with ${conv['name']} created');
+        //print('Conversation with ${conv['name']} created');
       }
 
-      print('All dummy data initialized successfully!');
+      //print('All dummy data initialized successfully!');
     } catch (e) {
-      print('Error initializing data: $e');
+      //print('Error initializing data: $e');
       rethrow;
     }
   }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:collection';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:template/chatBot/chatBot.dart';
+import 'package:template/chatBot/chat_bot.dart';
 
 const String _PREFS_KEY_AI_SETTINGS = "AI_SETTINGS";
 
@@ -71,9 +71,9 @@ class AISettings extends ChangeNotifier {
   }
 
 
-  String? get api_key => _apiKey;
+  String? get apiKey => _apiKey;
 
-  set api_key(String? value) {
+  set apiKey(String? value) {
     _apiKey = value;
     if (value != null && value.isNotEmpty) _promptable = Gemeni(value);
     notifyListeners();
@@ -126,7 +126,7 @@ class AISettings extends ChangeNotifier {
       }
       notifyListeners();
     } catch (e) {
-      print('⚠️ Failed to load AISettings: $e');
+      //print('⚠️ Failed to load AISettings: $e');
     }
     
   }

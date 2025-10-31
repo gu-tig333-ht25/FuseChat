@@ -44,7 +44,7 @@ class FirestoreService {
 
       return Rx.combineLatestList<int>(
         messageStreams,
-      ).map((counts) => counts.fold<int>(0, (sum, count) => sum + count));
+      ).map((counts) => counts.fold<int>(0, (s, c) => s + c));
     });
   }
 
@@ -60,7 +60,7 @@ class FirestoreService {
       }
       return null;
     } catch (e) {
-      print('Error getting conversation: $e');
+      //print('Error getting conversation: $e');
       return null;
     }
   }
@@ -113,7 +113,7 @@ class FirestoreService {
         return name;
       }
     } catch (e) {
-      print('Error fetching user name: $e');
+      //print('Error fetching user name: $e');
     }
 
     return 'User';
@@ -178,7 +178,7 @@ class FirestoreService {
       await _db.collection('users').doc(userId).update({'name': newName});
       return true;
     } catch (e) {
-      print('Error updating username: $e');
+      //print('Error updating username: $e');
       return false;
     }
   }
@@ -205,7 +205,7 @@ class FirestoreService {
           return _nameCache[userId]!;
         })
         .handleError((error) {
-          print('Error streaming user name: $error');
+          //print('Error streaming user name: $error');
           return 'User';
         });
   }
@@ -249,7 +249,7 @@ class FirestoreService {
       yield* messagesStream;
     }
   } catch (e) {
-    print('Error streaming conversation for LLM: $e');
+    //print('Error streaming conversation for LLM: $e');
     yield null;
   }
 }
@@ -277,7 +277,7 @@ class FirestoreService {
         };
       }).toList();
     } catch (e) {
-      print('Error getting messages for LLM: $e');
+      //print('Error getting messages for LLM: $e');
       return [];
     }
   }

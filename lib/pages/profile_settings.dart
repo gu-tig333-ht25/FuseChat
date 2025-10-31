@@ -40,23 +40,25 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
       bool resp = await firestoreService.setUsername(currentUserId, newName);
 
       if (!resp) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        if(context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text("Couldn't update nickname!"),
             backgroundColor: Theme.of(context).colorScheme.error,
             behavior: SnackBarBehavior.floating,
           ),
         );
+        }
         return;
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(
+      if(context.mounted){ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text("Nickname updated successfully!"),
           backgroundColor: Theme.of(context).colorScheme.primary,
           behavior: SnackBarBehavior.floating,
         ),
-      );
+      );}
     }
 
     return Scaffold(

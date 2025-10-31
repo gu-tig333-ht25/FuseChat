@@ -1,13 +1,12 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:template/chatBot/chatBot.dart';
-import 'package:template/models/AI_model.dart';
+import 'package:template/chatBot/chat_bot.dart';
+import 'package:template/models/ai_model.dart';
 import 'package:template/models/conversation_model.dart';
 import '../services/firestore_service.dart';
 import '../models/message_model.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
-import 'profile_view/AI_config_view.dart';
+import 'profile_view/ai_config_view.dart';
 import 'package:template/theme/themedata.dart';
 import 'package:intl/intl.dart';
 import 'package:collection/collection.dart';
@@ -217,7 +216,7 @@ class MessagesStream extends StatelessWidget {
 
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (listScrollController.hasClients) {
-            print("jump");
+            //print("jump");
             listScrollController.jumpTo(
               listScrollController.position.maxScrollExtent,
             );
@@ -241,7 +240,7 @@ class MessagesStream extends StatelessWidget {
                 ? messages[index + 1].senderId
                 : '';
             return MessageBubble(
-              senderName: msg.senderName ?? msg.senderId,
+              senderName: msg.senderName,
               senderID: msg.senderId,
               previousSenderID: previousSenderID,
               nextSenderID: nextSenderID,
@@ -418,7 +417,7 @@ class AISuggestionBox extends StatelessWidget {
 
     if (promptable == null) {
       String reasonText;
-      if (settings.api_key == null) {
+      if (settings.apiKey == null) {
         reasonText = "API key has not been given";
       } else if (!settings.aiSuggestionsEnabled) {
         reasonText = "AI suggestions are disabled";

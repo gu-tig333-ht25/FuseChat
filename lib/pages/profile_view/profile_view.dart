@@ -5,7 +5,7 @@ import '/services/firestore_service.dart';
 import 'stat_card.dart';
 import 'settings_tile.dart';
 import '../../services/auth_service.dart';
-import 'AI_config_view.dart';
+import 'ai_config_view.dart';
 import '../../models/theme_model.dart';
 import '../profile_settings.dart';
 import '../../models/user_model.dart';
@@ -156,7 +156,7 @@ class ProfileView extends StatelessWidget {
                             ).colorScheme.secondary,
                             value: themeSettings.isDarkMode,
                             onChanged: (value) {
-                              print("set toggle $value");
+                              //print("set toggle $value");
                               themeSettings.isDarkMode = value;
                             },
                           ),
