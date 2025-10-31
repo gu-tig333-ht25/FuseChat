@@ -124,10 +124,11 @@ class AISettings extends ChangeNotifier {
         _apiKey = key;
         _promptable = Gemeni(key);
       }
+      notifyListeners();
     } catch (e) {
       print('⚠️ Failed to load AISettings: $e');
     }
-    notifyListeners();
+    
   }
 }
 
