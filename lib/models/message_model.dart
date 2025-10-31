@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class Message {
   final String id;
   final String senderId;
-  final String? senderName;
+  final String senderName;
   final String text;
   final DateTime? timestamp;
   final bool isRead;
@@ -12,7 +12,7 @@ class Message {
   Message({
     required this.id,
     required this.senderId,
-    this.senderName,
+    required this.senderName,
     required this.text,
     this.timestamp,
     required this.isRead,
