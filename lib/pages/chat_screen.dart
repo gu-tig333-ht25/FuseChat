@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:template/chatBot/chatBot.dart';
@@ -9,6 +10,7 @@ import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'profile_view/AI_config_view.dart';
 import 'package:template/theme/themedata.dart';
 import 'package:intl/intl.dart';
+import 'package:collection/collection.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({
@@ -430,8 +432,22 @@ class AISuggestionBox extends StatelessWidget {
     if (personality == null) {
       return Text("Personality has not been selected");
     }
-
+    Map<String, List<String>> nameGroupedById =
+        groupBy(messages, (Message m) => m.senderId).map(
+          (key, value) => MapEntry(
+            key,
+            value.map((e) => e.senderName).toList().reversed.toList(),
+          ),
+        );
     // Get current user
+
+    Map<String, String> currentNPreviousNames = nameGroupedById.map(
+      (key, value) => MapEntry(
+        key,
+        "${value.first}t ${(value.length > 1 ? "(previously known as: ${value.sublist(1).toSet().join(", ")})" : "")}",
+      ),
+    );
+
     final currentUserId = auth.FirebaseAuth.instance.currentUser?.uid ?? '';
 
     // Don't show suggestions if conversation is empty
@@ -440,27 +456,11 @@ class AISuggestionBox extends StatelessWidget {
     }
 
     // Find current user's name from messages
-    final currentUserName =
-        messages
-            .firstWhere(
-              (m) => m.senderId == currentUserId,
-              orElse: () => Message(
-                id: '',
-                senderId: currentUserId,
-                senderName: 'You',
-                text: '',
-                isRead: false,
-              ),
-            )
-            .senderName ??
-        'You';
+    final currentUserName = currentNPreviousNames[currentUserId] ?? auth.FirebaseAuth.instance.currentUser?.displayName ?? "User";
 
     // Extract other user names
-    final otherUsers = messages
-        .where((m) => m.senderId != currentUserId)
-        .map((m) => m.senderName ?? 'Unknown')
-        .where((name) => name != 'Unknown')
-        .toSet()
+    final otherUsers = currentNPreviousNames.entries
+        .where((m) => m.key != currentUserId).map((e) => e.value,)
         .toList();
 
     return FutureBuilder(
