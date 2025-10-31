@@ -455,11 +455,15 @@ class AISuggestionBox extends StatelessWidget {
     }
 
     // Find current user's name from messages
-    final currentUserName = currentNPreviousNames[currentUserId] ?? auth.FirebaseAuth.instance.currentUser?.displayName ?? "User";
+    final currentUserName =
+        currentNPreviousNames[currentUserId] ??
+        auth.FirebaseAuth.instance.currentUser?.displayName ??
+        "User";
 
     // Extract other user names
     final otherUsers = currentNPreviousNames.entries
-        .where((m) => m.key != currentUserId).map((e) => e.value,)
+        .where((m) => m.key != currentUserId)
+        .map((e) => e.value)
         .toList();
 
     return FutureBuilder(

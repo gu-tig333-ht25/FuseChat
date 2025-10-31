@@ -9,7 +9,7 @@ class Conversation {
   final List<String> participantIds;
   final String lastMessage;
   final DateTime? lastMessageTime;
-  
+
   final List<User> participants;
   final List<Message> messages;
 
@@ -26,7 +26,7 @@ class Conversation {
   // Create from Firestore document
   factory Conversation.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
-    
+
     return Conversation(
       id: doc.id,
       name: data['name'] ?? '',
@@ -42,8 +42,8 @@ class Conversation {
       'name': name,
       'participants': participantIds,
       'lastMessage': lastMessage,
-      'lastMessageTime': lastMessageTime != null 
-          ? Timestamp.fromDate(lastMessageTime!) 
+      'lastMessageTime': lastMessageTime != null
+          ? Timestamp.fromDate(lastMessageTime!)
           : FieldValue.serverTimestamp(),
     };
   }
@@ -70,10 +70,10 @@ class Conversation {
   }
 }
 
-class ConversationFilterState extends ChangeNotifier{
+class ConversationFilterState extends ChangeNotifier {
   String _filter = "";
 
-  set filter(String filter){
+  set filter(String filter) {
     _filter = filter;
     notifyListeners();
   }

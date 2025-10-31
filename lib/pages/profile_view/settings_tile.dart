@@ -26,15 +26,9 @@ class SettingsTile extends StatelessWidget {
         color: iconColor ?? TextTheme.of(context).labelLarge?.color,
         size: 30,
       ),
-      title: Text(
-        label,
-        style: TextTheme.of(context).titleLarge,
-      ),
+      title: Text(label, style: TextTheme.of(context).titleLarge),
       trailing: actionText.isNotEmpty
-          ? Text(
-              actionText,
-              style: TextTheme.of(context).labelLarge,
-            )
+          ? Text(actionText, style: TextTheme.of(context).labelLarge)
           : null,
       onTap: onTap,
       contentPadding: const EdgeInsets.fromLTRB(30, 12, 30, 12),

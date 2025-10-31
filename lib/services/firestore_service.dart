@@ -211,49 +211,48 @@ class FirestoreService {
   }
 
   // Get conversation with messages for LLM
- Stream<Conversation?> getConversationForLLM(String conversationId) async* {
-  try {
-    // First, get a stream of the conversation document itself
-    final conversationDocStream = _db
-        .collection('conversations')
-        .doc(conversationId)
-        .snapshots();
-
-    // Then, for each conversation snapshot, combine it with its message stream
-    await for (final conversationSnapshot in conversationDocStream) {
-      if (!conversationSnapshot.exists) {
-        yield null;
-        continue;
-      }
-
-      // Build the Conversation object (you probably already have a fromFirestore)
-      final conversation = Conversation.fromFirestore(conversationSnapshot);
-
-      // Now, stream the messages
-      final messagesStream = _db
+  Stream<Conversation?> getConversationForLLM(String conversationId) async* {
+    try {
+      // First, get a stream of the conversation document itself
+      final conversationDocStream = _db
           .collection('conversations')
           .doc(conversationId)
-          .collection('messages')
-          .orderBy('timestamp')
-          .snapshots()
-          .map((messagesSnapshot) {
-            final messages = messagesSnapshot.docs
-                .map((doc) => Message.fromFirestore(doc))
-                .toList();
+          .snapshots();
 
-            // Return the conversation updated with messages
-            return conversation.copyWith(messages: messages);
-          });
+      // Then, for each conversation snapshot, combine it with its message stream
+      await for (final conversationSnapshot in conversationDocStream) {
+        if (!conversationSnapshot.exists) {
+          yield null;
+          continue;
+        }
 
-      // Yield the messagesStream so we continue listening
-      yield* messagesStream;
+        // Build the Conversation object (you probably already have a fromFirestore)
+        final conversation = Conversation.fromFirestore(conversationSnapshot);
+
+        // Now, stream the messages
+        final messagesStream = _db
+            .collection('conversations')
+            .doc(conversationId)
+            .collection('messages')
+            .orderBy('timestamp')
+            .snapshots()
+            .map((messagesSnapshot) {
+              final messages = messagesSnapshot.docs
+                  .map((doc) => Message.fromFirestore(doc))
+                  .toList();
+
+              // Return the conversation updated with messages
+              return conversation.copyWith(messages: messages);
+            });
+
+        // Yield the messagesStream so we continue listening
+        yield* messagesStream;
+      }
+    } catch (e) {
+      //print('Error streaming conversation for LLM: $e');
+      yield null;
     }
-  } catch (e) {
-    //print('Error streaming conversation for LLM: $e');
-    yield null;
   }
-}
-
 
   // Helper to get messages formatted for LLM
   Future<List<Map<String, dynamic>>> getMessagesForLLM(

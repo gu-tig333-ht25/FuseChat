@@ -70,7 +70,6 @@ class AISettings extends ChangeNotifier {
     return true;
   }
 
-
   String? get apiKey => _apiKey;
 
   set apiKey(String? value) {
@@ -128,7 +127,6 @@ class AISettings extends ChangeNotifier {
     } catch (e) {
       //print('⚠️ Failed to load AISettings: $e');
     }
-    
   }
 }
 

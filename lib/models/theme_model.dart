@@ -7,11 +7,12 @@ class ThemeSettings extends ChangeNotifier {
 
   set isDarkMode(bool b) {
     ThemeData newData = b ? fuseChatDarkTheme : fuseChatLightTheme;
-    if (newData != _data){
+    if (newData != _data) {
       _data = newData;
       notifyListeners();
     }
   }
+
   get isDarkMode => _data == fuseChatDarkTheme;
 
   ThemeData get theme => _data.copyWith();

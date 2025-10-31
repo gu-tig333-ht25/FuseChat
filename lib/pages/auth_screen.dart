@@ -81,7 +81,9 @@ class _AuthScreenState extends State<AuthScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const Spacer(),
-                Center(child: Text('FuseChat', style: theme.textTheme.displayLarge)),
+                Center(
+                  child: Text('FuseChat', style: theme.textTheme.displayLarge),
+                ),
                 const SizedBox(height: 30),
                 Image.asset('assets/logo.png', width: 180, height: 180),
                 const SizedBox(height: 40),

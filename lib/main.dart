@@ -30,7 +30,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => MyAuthProvider()),
         Provider<FirestoreService>(create: (_) => FirestoreService()),
         ChangeNotifierProvider(create: (_) => ChatbotLastPrompts()),
-        ChangeNotifierProvider(create:(_) => ConversationFilterState(),)
+        ChangeNotifierProvider(create: (_) => ConversationFilterState()),
       ],
       child: MyApp(),
     ),

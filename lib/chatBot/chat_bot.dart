@@ -54,8 +54,10 @@ Future<PromptResponse> prompt({
         List<String> otherUsers,
         String Function(String userName, String message),
       )
-      baseSystemPrompt = basicBaseSystemPrompt,
-  String Function(String userName, String message) formatUserMessage = bracketFormat,
+      baseSystemPrompt =
+      basicBaseSystemPrompt,
+  String Function(String userName, String message) formatUserMessage =
+      bracketFormat,
 }) {
   String systemPrompt =
       baseSystemPrompt(user, otherUsers, formatUserMessage) + personalitySpec;
@@ -64,7 +66,7 @@ Future<PromptResponse> prompt({
 
   for (var m in chat) {
     final messageSender = m.senderName;
-    
+
     if (m.aiGenerated && messageSender == user) {
       if (userMessage != "") {
         chatBotMessages.add(ChatBotMessage(Role.user, userMessage));
@@ -72,12 +74,13 @@ Future<PromptResponse> prompt({
       chatBotMessages.add(ChatBotMessage(Role.model, m.text));
       userMessage = "";
     } else {
-      userMessage = """$userMessage
+      userMessage =
+          """$userMessage
 ${formatUserMessage(messageSender, m.text)}
 """;
     }
   }
-  
+
   if (userMessage != "") {
     chatBotMessages.add(ChatBotMessage(Role.user, userMessage));
   }
@@ -98,15 +101,13 @@ class Gemeni implements Promptable {
     List<Content> contentChat = chat
         .map((m) => Content(role: m.role.name, parts: [Part.text(m.message)]))
         .toList();
-    
+
     Candidates? candidates = await Gemini.instance.chat(
       contentChat,
-      generationConfig: GenerationConfig(
-        maxOutputTokens: 1000,
-      ),
+      generationConfig: GenerationConfig(maxOutputTokens: 1000),
       systemPrompt: systemPrompt,
     );
-    
+
     return PromptResponse(candidates?.output, candidates?.finishReason);
   }
 }

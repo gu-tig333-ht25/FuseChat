@@ -10,16 +10,66 @@ class FirestoreInitializer {
 
       // Add all users to the users collection
       final users = [
-        {'id': currentUserId, 'name': 'Alice Andersson', 'email': 'alice@example.com', 'imageUrl': ''},
-        {'id': 'u2', 'name': 'Björn Berg', 'email': 'bjorn@example.com', 'imageUrl': ''},
-        {'id': 'u3', 'name': 'Carla Carlsson', 'email': 'carla@example.com', 'imageUrl': ''},
-        {'id': 'u4', 'name': 'David Dahl', 'email': 'david@example.com', 'imageUrl': ''},
-        {'id': 'u5', 'name': 'Ella Ek', 'email': 'ella@example.com', 'imageUrl': ''},
-        {'id': 'u6', 'name': 'Filip Fors', 'email': 'filip@example.com', 'imageUrl': ''},
-        {'id': 'u7', 'name': 'Greta Gustafsson', 'email': 'greta@example.com', 'imageUrl': ''},
-        {'id': 'u8', 'name': 'Henrik Holm', 'email': 'henrik@example.com', 'imageUrl': ''},
-        {'id': 'u9', 'name': 'Isabella Isaksson', 'email': 'isabella@example.com', 'imageUrl': ''},
-        {'id': 'u10', 'name': 'Jonas Johansson', 'email': 'jonas@example.com', 'imageUrl': ''},
+        {
+          'id': currentUserId,
+          'name': 'Alice Andersson',
+          'email': 'alice@example.com',
+          'imageUrl': '',
+        },
+        {
+          'id': 'u2',
+          'name': 'Björn Berg',
+          'email': 'bjorn@example.com',
+          'imageUrl': '',
+        },
+        {
+          'id': 'u3',
+          'name': 'Carla Carlsson',
+          'email': 'carla@example.com',
+          'imageUrl': '',
+        },
+        {
+          'id': 'u4',
+          'name': 'David Dahl',
+          'email': 'david@example.com',
+          'imageUrl': '',
+        },
+        {
+          'id': 'u5',
+          'name': 'Ella Ek',
+          'email': 'ella@example.com',
+          'imageUrl': '',
+        },
+        {
+          'id': 'u6',
+          'name': 'Filip Fors',
+          'email': 'filip@example.com',
+          'imageUrl': '',
+        },
+        {
+          'id': 'u7',
+          'name': 'Greta Gustafsson',
+          'email': 'greta@example.com',
+          'imageUrl': '',
+        },
+        {
+          'id': 'u8',
+          'name': 'Henrik Holm',
+          'email': 'henrik@example.com',
+          'imageUrl': '',
+        },
+        {
+          'id': 'u9',
+          'name': 'Isabella Isaksson',
+          'email': 'isabella@example.com',
+          'imageUrl': '',
+        },
+        {
+          'id': 'u10',
+          'name': 'Jonas Johansson',
+          'email': 'jonas@example.com',
+          'imageUrl': '',
+        },
       ];
 
       for (var user in users) {
@@ -40,40 +90,90 @@ class FirestoreInitializer {
           'name': 'Björn Berg',
           'otherUserId': 'u2',
           'messages': [
-            {'senderId': currentUserId, 'senderName': 'Alice Andersson', 'text': 'Hej Björn!', 'minutesAgo': 20},
-            {'senderId': 'u2', 'senderName': 'Björn Berg', 'text': 'Hej Alice! Hur är läget? bla bla bla bla', 'minutesAgo': 19},
+            {
+              'senderId': currentUserId,
+              'senderName': 'Alice Andersson',
+              'text': 'Hej Björn!',
+              'minutesAgo': 20,
+            },
+            {
+              'senderId': 'u2',
+              'senderName': 'Björn Berg',
+              'text': 'Hej Alice! Hur är läget? bla bla bla bla',
+              'minutesAgo': 19,
+            },
           ],
         },
         {
           'name': 'Carla Carlsson',
           'otherUserId': 'u3',
           'messages': [
-            {'senderId': 'u3', 'senderName': 'Carla Carlsson', 'text': 'Vi ses imorgon på jobbet?', 'minutesAgo': 60},
-            {'senderId': currentUserId, 'senderName': 'Alice Andersson', 'text': 'Japp, vi ses då 👋 bla bla bla bla bla bla', 'minutesAgo': 50},
+            {
+              'senderId': 'u3',
+              'senderName': 'Carla Carlsson',
+              'text': 'Vi ses imorgon på jobbet?',
+              'minutesAgo': 60,
+            },
+            {
+              'senderId': currentUserId,
+              'senderName': 'Alice Andersson',
+              'text': 'Japp, vi ses då 👋 bla bla bla bla bla bla',
+              'minutesAgo': 50,
+            },
           ],
         },
         {
           'name': 'David Dahl',
           'otherUserId': 'u4',
           'messages': [
-            {'senderId': 'u4', 'senderName': 'David Dahl', 'text': 'Glöm inte rapporten!', 'minutesAgo': 180},
-            {'senderId': currentUserId, 'senderName': 'Alice Andersson', 'text': 'Tack för påminnelsen 🙈 bla bla bla bla', 'minutesAgo': 175},
+            {
+              'senderId': 'u4',
+              'senderName': 'David Dahl',
+              'text': 'Glöm inte rapporten!',
+              'minutesAgo': 180,
+            },
+            {
+              'senderId': currentUserId,
+              'senderName': 'Alice Andersson',
+              'text': 'Tack för påminnelsen 🙈 bla bla bla bla',
+              'minutesAgo': 175,
+            },
           ],
         },
         {
           'name': 'Ella Ek',
           'otherUserId': 'u5',
           'messages': [
-            {'senderId': currentUserId, 'senderName': 'Alice Andersson', 'text': 'Hur går det med projektet?', 'minutesAgo': 300},
-            {'senderId': 'u5', 'senderName': 'Ella Ek', 'text': 'Bra! Nästan klart nu 😄 bla bla bla bla bla bla', 'minutesAgo': 290},
+            {
+              'senderId': currentUserId,
+              'senderName': 'Alice Andersson',
+              'text': 'Hur går det med projektet?',
+              'minutesAgo': 300,
+            },
+            {
+              'senderId': 'u5',
+              'senderName': 'Ella Ek',
+              'text': 'Bra! Nästan klart nu 😄 bla bla bla bla bla bla',
+              'minutesAgo': 290,
+            },
           ],
         },
         {
           'name': 'Filip Fors',
           'otherUserId': 'u6',
           'messages': [
-            {'senderId': 'u6', 'senderName': 'Filip Fors', 'text': 'Kommer du på träningen?', 'minutesAgo': 420},
-            {'senderId': currentUserId, 'senderName': 'Alice Andersson', 'text': 'Ja, jag är på väg!', 'minutesAgo': 415},
+            {
+              'senderId': 'u6',
+              'senderName': 'Filip Fors',
+              'text': 'Kommer du på träningen?',
+              'minutesAgo': 420,
+            },
+            {
+              'senderId': currentUserId,
+              'senderName': 'Alice Andersson',
+              'text': 'Ja, jag är på väg!',
+              'minutesAgo': 415,
+            },
           ],
         },
       ];
@@ -88,7 +188,9 @@ class FirestoreInitializer {
           'participants': [currentUserId, conv['otherUserId']],
           'lastMessage': lastMsg['text'],
           'lastMessageTime': Timestamp.fromDate(
-            DateTime.now().subtract(Duration(minutes: lastMsg['minutesAgo'] as int)),
+            DateTime.now().subtract(
+              Duration(minutes: lastMsg['minutesAgo'] as int),
+            ),
           ),
         });
 
@@ -99,10 +201,12 @@ class FirestoreInitializer {
             'senderName': msg['senderName'],
             'text': msg['text'],
             'timestamp': Timestamp.fromDate(
-              DateTime.now().subtract(Duration(minutes: msg['minutesAgo'] as int)),
+              DateTime.now().subtract(
+                Duration(minutes: msg['minutesAgo'] as int),
+              ),
             ),
             'isRead': true,
-            'aiGenerated': false,  // Added for AI integration
+            'aiGenerated': false, // Added for AI integration
           });
         }
 

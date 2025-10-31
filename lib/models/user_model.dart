@@ -15,7 +15,7 @@ class User {
 
   factory User.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
-    
+
     return User(
       id: doc.id,
       name: data['name'] ?? '',
@@ -26,20 +26,11 @@ class User {
 
   // Convert to Firestore document
   Map<String, dynamic> toFirestore() {
-    return {
-      'name': name,
-      'email': email,
-      'imageUrl': imageUrl,
-    };
+    return {'name': name, 'email': email, 'imageUrl': imageUrl};
   }
 
   // Create a copy with updated fields
-  User copyWith({
-    String? id,
-    String? name,
-    String? email,
-    String? imageUrl,
-  }) {
+  User copyWith({String? id, String? name, String? email, String? imageUrl}) {
     return User(
       id: id ?? this.id,
       name: name ?? this.name,

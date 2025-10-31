@@ -12,9 +12,7 @@ class AuthWrapper extends StatelessWidget {
     final auth = context.watch<MyAuthProvider>();
 
     if (auth.user == null && auth.isLoading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     // ConversationScreen is the "default" page that is navigated to after a user is logged in.
@@ -27,7 +25,7 @@ class AuthWrapper extends StatelessWidget {
           Navigator.of(context).popUntil((route) => route.isFirst);
         }
       });
-      
+
       return const AuthScreen();
     }
   }

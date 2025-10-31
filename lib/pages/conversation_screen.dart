@@ -134,7 +134,6 @@ class ConversationScreen extends StatelessWidget {
                 leading: Icon(Icons.menu),
                 trailing: [Icon(Icons.search)],
                 onChanged: (value) {
-                  
                   context.read<ConversationFilterState>().filter = value;
                 },
               ),
@@ -154,7 +153,11 @@ class ConversationScreen extends StatelessWidget {
                   return Selector<ConversationFilterState, List<Conversation>>(
                     selector: (BuildContext p1, ConversationFilterState p2) =>
                         snapshot.data!
-                            .where((c) => c.name.toLowerCase().contains(RegExp(p2.filter.toLowerCase())))
+                            .where(
+                              (c) => c.name.toLowerCase().contains(
+                                RegExp(p2.filter.toLowerCase()),
+                              ),
+                            )
                             .toList(),
                     shouldRebuild: (previous, next) =>
                         (previous.length != next.length) ||

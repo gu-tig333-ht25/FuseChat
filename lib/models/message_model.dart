@@ -37,7 +37,9 @@ class Message {
       'senderId': senderId,
       'senderName': senderName,
       'text': text,
-      'timestamp': timestamp != null ? Timestamp.fromDate(timestamp!) : FieldValue.serverTimestamp(),
+      'timestamp': timestamp != null
+          ? Timestamp.fromDate(timestamp!)
+          : FieldValue.serverTimestamp(),
       'isRead': isRead,
       'aiGenerated': aiGenerated,
     };
