@@ -70,18 +70,6 @@ class AISettings extends ChangeNotifier {
     return true;
   }
 
-  void addPersonality(Personality p) {
-    _personalities.add(p);
-    notifyListeners();
-  }
-
-  bool removeAt(int index) {
-    if (index >= _personalities.length) return false;
-    if (isSelected(_personalities[index])) selectedPersonality = null;
-    _personalities.removeAt(index);
-    notifyListeners();
-    return true;
-  }
 
   String? get api_key => _apiKey;
 
