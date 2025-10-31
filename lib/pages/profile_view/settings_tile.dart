@@ -23,25 +23,17 @@ class SettingsTile extends StatelessWidget {
     return ListTile(
       leading: Icon(
         icon,
-        color: iconColor ?? Color.fromARGB(255, 204, 208, 211),
+        color: iconColor ?? TextTheme.of(context).labelLarge?.color,
         size: 30,
       ),
       title: Text(
         label,
-        style: TextStyle(
-          fontSize: 20,
-          fontWeight: FontWeight.w100,
-          color: textColor ?? Color.fromARGB(255, 204, 208, 211),
-        ),
+        style: TextTheme.of(context).titleLarge,
       ),
       trailing: actionText.isNotEmpty
           ? Text(
               actionText,
-              style: TextStyle(
-                color: Color.fromARGB(200, 204, 208, 211),
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
+              style: TextTheme.of(context).labelLarge,
             )
           : null,
       onTap: onTap,

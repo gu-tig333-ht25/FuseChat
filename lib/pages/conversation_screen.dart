@@ -1,45 +1,113 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../data/dummy_conversation_data.dart';
-import '../auth/auth_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart' as auth;
+import 'package:provider/provider.dart';
+import '../services/firestore_service.dart';
+import '../models/conversation_model.dart';
+import 'chat_screen.dart';
+import 'profile_view/profile_view.dart';
+import 'package:template/theme/themedata.dart';
 
-class ConversationScreen extends StatefulWidget {
-  const ConversationScreen({super.key});
+class ConversationScreen extends StatelessWidget {
+  final TextEditingController _chatNameController = TextEditingController();
+  ConversationScreen({super.key});
+  Future<void> createChatDialog(BuildContext context) {
+    final firestoreService = Provider.of<FirestoreService>(
+      context,
+      listen: false,
+    );
+    final currentUserId = auth.FirebaseAuth.instance.currentUser?.uid ?? '';
 
-  @override
-  State<ConversationScreen> createState() => _ConversationScreenState();
-}
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Center(child: Text('Create Chat')),
+          content: TextField(
+            controller: _chatNameController,
+            decoration: InputDecoration(hintText: "chat name"),
+          ),
+          actions: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                TextButton(
+                  style: TextButton.styleFrom(
+                    textStyle: Theme.of(context).textTheme.labelLarge,
+                  ),
+                  child: const Text('Cancel'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                TextButton(
+                  style: TextButton.styleFrom(
+                    textStyle: Theme.of(context).textTheme.labelLarge,
+                  ),
+                  child: const Text('Create'),
+                  onPressed: () {
+                    final chatName = _chatNameController.text.trim();
+                    if (chatName.isEmpty) return;
 
-class _ConversationScreenState extends State<ConversationScreen> {
-  //final TextEditingController _searchController = TextEditingController();
-  String _searchText = '';
+                    firestoreService.createConversation(
+                      name: chatName,
+                      participantIds: [currentUserId],
+                    );
+
+                    _chatNameController.clear();
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(context) {
+    final currentUserId = auth.FirebaseAuth.instance.currentUser?.uid ?? '';
+    final firestoreService = Provider.of<FirestoreService>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text(
           'FuseChat',
           style: GoogleFonts.irishGrover(
-            fontSize: 28,
-            color: Colors.white,
+            textStyle: Theme.of(context).textTheme.displayMedium,
           ),
         ),
-        leading: IconButton(
-          onPressed: () async {
-            await FirebaseAuth.instance.signOut();
-            print('User signed out');
-            if (context.mounted) {
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(
-                  builder: (context) => const AuthScreen(),
+        leading: Padding(
+          padding: const EdgeInsets.fromLTRB(3, 0, 0, 0),
+          child: StreamBuilder<String>(
+            stream: firestoreService.getUserName(currentUserId),
+            builder: (context, snapshot) {
+              final userName = snapshot.data ?? 'User';
+              return TextButton(
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => ProfileView()),
+                  );
+                },
+                style: TextButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  padding: EdgeInsets.zero,
+                ),
+                child: CircleAvatar(
+                  radius: 20,
+                  child: Text(
+                    userName[0].toUpperCase(),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodyLarge?.copyWith(fontSize: 23),
+                  ),
                 ),
               );
-            }
-          },
-          icon: const Icon(Icons.logout, color: Colors.white,),
-          tooltip: 'Sign Out',
+            },
+          ),
         ),
       ),
       body: Center(
@@ -48,45 +116,105 @@ class _ConversationScreenState extends State<ConversationScreen> {
             Padding(
               padding: EdgeInsets.all(16),
               child: SearchBar(
+                shadowColor: WidgetStatePropertyAll(
+                  Theme.of(context).colorScheme.primary,
+                ),
+                backgroundColor: WidgetStatePropertyAll(
+                  Theme.of(context).colorScheme.onSurface,
+                ),
+                textStyle: WidgetStatePropertyAll(
+                  TextTheme.of(context).bodyMedium?.copyWith(
+                    color: TextTheme.of(
+                      context,
+                    ).bodyMedium?.color?.withValues(alpha: 0.4),
+                  ),
+                ),
+
                 hintText: 'Search conversations',
-                leading: Icon(Icons.menu, color: Colors.black,),
-                trailing: [Icon(Icons.search, color: Colors.black)],
+                leading: Icon(Icons.menu),
+                trailing: [Icon(Icons.search)],
                 onChanged: (value) {
-                  setState(() {
-                    _searchText = value;
-                  });
-                  debugPrint('Search text: $_searchText');
+                  
+                  context.read<ConversationFilterState>().filter = value;
                 },
               ),
             ),
             Expanded(
-              child: ListView.builder(
-                itemCount: dummyConversations.length,
-                itemBuilder: (context, index) {
-                  final chat = dummyConversations[index];
-                  return Card(
-                    margin: EdgeInsets.all(2),
-                    child: ListTile(
-                      leading: CircleAvatar(
-                        child: Text(
-                          chat.participants[1].name[0].toUpperCase(), 
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold
-                          ), 
-                        ),
-                      ),
-                      title: Text(chat.participants[1].name, style: TextStyle(color: Colors.white),),
-                      subtitle: Text(chat.messages.last.text,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 13,
-                        ),
-                      ),
-                      trailing: Text(chat.messages.last.timestamp.toString(), 
-                      ),
-                      onTap: () {},
-                    ),
+              child: StreamBuilder<List<Conversation>>(
+                stream: firestoreService.getConversations(currentUserId),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Center(child: Text('No conversations yet'));
+                  }
+
+                  return Selector<ConversationFilterState, List<Conversation>>(
+                    selector: (BuildContext p1, ConversationFilterState p2) =>
+                        snapshot.data!
+                            .where((c) => c.name.toLowerCase().contains(RegExp(p2.filter.toLowerCase())))
+                            .toList(),
+                    shouldRebuild: (previous, next) =>
+                        (previous.length != next.length) ||
+                        previous.every((element) => next.contains(element)),
+                    builder: (_, conversations, _) {
+                      return ListView.builder(
+                        itemCount: conversations.length,
+                        itemBuilder: (context, index) {
+                          final conv = conversations[index];
+                          return Card(
+                            margin: EdgeInsets.all(2),
+                            child: ListTile(
+                              leading: CircleAvatar(
+                                backgroundColor:
+                                    conversationBubbleColors[index %
+                                        conversationBubbleColors.length],
+                                child: Text(
+                                  conv.name.isNotEmpty
+                                      ? conv.name[0].toUpperCase()
+                                      : 'C',
+                                  style: TextTheme.of(context).titleMedium
+                                      ?.copyWith(fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                              title: Text(
+                                conv.name,
+                                style: TextTheme.of(context).titleMedium,
+                              ),
+                              subtitle: Text(
+                                conv.lastMessage,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextTheme.of(context).labelLarge
+                                    ?.copyWith(
+                                      color: TextTheme.of(context)
+                                          .labelLarge
+                                          ?.color
+                                          ?.withValues(alpha: 0.5),
+                                    ),
+                              ),
+                              trailing: conv.lastMessageTime != null
+                                  ? Text(
+                                      '${conv.lastMessageTime!.hour}:${conv.lastMessageTime!.minute.toString().padLeft(2, '0')}',
+                                    )
+                                  : null,
+                              onTap: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) => ChatScreen(
+                                      conversationId: conv.id,
+                                      chatTitle: conv.name,
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          );
+                        },
+                      );
+                    },
                   );
                 },
               ),
@@ -95,9 +223,11 @@ class _ConversationScreenState extends State<ConversationScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: (){},
+        onPressed: () {
+          createChatDialog(context);
+        },
         child: const Icon(Icons.message),
-        )
+      ),
     );
   }
 }

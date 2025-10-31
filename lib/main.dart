@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'auth/firebase_options.dart';
+import 'services/firebase_options.dart';
+import 'package:provider/provider.dart';
 import 'theme/themedata.dart';
-
-import 'auth/auth_screen.dart';
-import 'pages/conversation_screen.dart';
-import 'pages/profile_view/profile_view.dart';
-import 'pages/chat_screen.dart';
+import 'services/auth_service.dart';
+import 'services/auth_wrapper.dart';
+import 'services/firestore_service.dart';
+import 'models/theme_model.dart';
+import 'models/AI_model.dart';
+import 'models/conversation_model.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,8 +20,21 @@ void main() async {
   } catch (e) {
     throw ('Firebase initialization failed: $e');
   }
-
-  runApp(MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AISettings()),
+        ChangeNotifierProvider(
+          create: (context) => ThemeSettings(fuseChatDarkTheme),
+        ),
+        ChangeNotifierProvider(create: (_) => MyAuthProvider()),
+        Provider<FirestoreService>(create: (_) => FirestoreService()),
+        ChangeNotifierProvider(create: (_) => ChatbotLastPrompts()),
+        ChangeNotifierProvider(create:(_) => ConversationFilterState(),)
+      ],
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -28,12 +42,11 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    ThemeSettings themeSettings = context.watch<ThemeSettings>();
     return MaterialApp(
-      title: 'FuseChat',
-      theme: fuseChatDarkTheme,
       debugShowCheckedModeBanner: false,
-      //if loggedin
-      home: ProfileView(),
+      theme: themeSettings.theme,
+      home: const AuthWrapper(),
     );
   }
 }
