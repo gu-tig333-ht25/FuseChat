@@ -18,6 +18,7 @@ class ProfileView extends StatelessWidget {
     final currentUserId = auth.FirebaseAuth.instance.currentUser?.uid ?? '';
     final firestoreService = Provider.of<FirestoreService>(context);
     ThemeSettings themeSettings = context.watch<ThemeSettings>();
+
     return StreamBuilder(
       stream: firestoreService.getUser(currentUserId),
       builder: (context, snapshot) {
@@ -56,29 +57,25 @@ class ProfileView extends StatelessWidget {
             body: SingleChildScrollView(
               child: Center(
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            const SizedBox(height: 20),
-                            CircleAvatar(
-                              radius: 30,
-                              child: Text(
-                                (user.email[0]).toUpperCase(),
-                                style: Theme.of(
-                                  context,
-                                ).textTheme.titleLarge?.copyWith(fontSize: 22),
-                              ),
-                            ),
-                            const SizedBox(height: 20),
-                            Text(
-                              user.email,
-                              style: TextTheme.of(context).titleLarge,
-                            ),
-                          ],
+                        const SizedBox(height: 20),
+                        CircleAvatar(
+                          radius: 40,
+                          child: Text(
+                            (user.name[0]).toUpperCase(),
+                            style: Theme.of(
+                              context,
+                            ).textTheme.titleLarge?.copyWith(fontSize: 35),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        Text(
+                          user.email,
+                          style: Theme.of(context).textTheme.titleLarge,
                         ),
                       ],
                     ),
@@ -86,48 +83,50 @@ class ProfileView extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.all(12.0),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          StreamBuilder<int>(
-                            stream: firestoreService.getAmountMessages(
-                              currentUserId,
-                            ),
-                            builder: (context, snapshot) {
-                              final messages = snapshot.data ?? "";
-                              return Expanded(
-                                child: (snapshot.data != null)
+                          Expanded(
+                            child: StreamBuilder<int>(
+                              stream: firestoreService.getAmountMessages(
+                                currentUserId,
+                              ),
+                              builder: (context, snapshot) {
+                                final messages = snapshot.data ?? "";
+
+                                return (snapshot.hasData)
                                     ? StatCard(
                                         icon: Icons.message_outlined,
                                         color: Colors.blue,
                                         value: '$messages',
                                         label: 'Messages',
                                       )
-                                    : Spacer(),
-                              );
-                            },
+                                    : const SizedBox.shrink();
+                              },
+                            ),
                           ),
                           SizedBox(width: 10),
-                          StreamBuilder(
-                            stream: firestoreService.getAmountConversations(
-                              currentUserId,
-                            ),
-                            builder: (context, snapshot) {
-                              final groups = snapshot.data ?? "";
+                          Expanded(
+                            child: StreamBuilder(
+                              stream: firestoreService.getAmountConversations(
+                                currentUserId,
+                              ),
+                              builder: (context, snapshot) {
+                                final groups = snapshot.data ?? "";
 
-                              return Expanded(
-                                child: StatCard(
-                                  icon: Icons.group,
-                                  color: Colors.purpleAccent,
-                                  value: '$groups',
-                                  label: 'Groups',
-                                ),
-                              );
-                            },
+                                return (snapshot.hasData)
+                                    ? StatCard(
+                                        icon: Icons.group,
+                                        color: Colors.purpleAccent,
+                                        value: '$groups',
+                                        label: 'Groups',
+                                      )
+                                    : const SizedBox.shrink();
+                              },
+                            ),
                           ),
                         ],
                       ),
                     ),
-                    Divider(thickness: 1, color: Colors.grey[300], height: 40),
+                    Divider(thickness: 2, height: 40),
 
                     Column(
                       children: [
@@ -140,12 +139,14 @@ class ProfileView extends StatelessWidget {
                           ),
                           leading: Icon(
                             Icons.dark_mode,
-                            color: TextTheme.of(context).labelLarge?.color,
+                            color: Theme.of(
+                              context,
+                            ).textTheme.labelLarge?.color,
                             size: 30,
                           ),
                           title: Text(
                             "Toggle dark mode",
-                            style: TextTheme.of(context).titleLarge,
+                            style: Theme.of(context).textTheme.titleLarge,
                           ),
                           trailing: Switch(
                             inactiveTrackColor: Theme.of(
@@ -156,7 +157,6 @@ class ProfileView extends StatelessWidget {
                             ).colorScheme.secondary,
                             value: themeSettings.isDarkMode,
                             onChanged: (value) {
-                              print("set toggle $value");
                               themeSettings.isDarkMode = value;
                             },
                           ),
