@@ -40,15 +40,19 @@ Create a Firebase account, enable authentication, and enable Cloud Firestore.
 
 ## Screenshots
 
-Login screen:
-<img src='/assets/screenshots/Login.png?raw=true' width='50%' />
+Login screen:  
 
-Conversations screen:
-<img src='/assets/screenshots/Convos.png?raw=true' width='50%' />
+<img src='/assets/screenshots/Login.png?raw=true' width='50%' />. 
 
-Chat screen:
-<img src='/assets/screenshots/Chat.png?raw=true' width='50%' />
+Conversations screen:  
 
-AI personality screen:
-<img src='/assets/screenshots/AIconf.png?raw=true' width='50%' />
+<img src='/assets/screenshots/Convos.png?raw=true' width='50%' />. 
+
+Chat screen:  
+
+<img src='/assets/screenshots/Chat.png?raw=true' width='50%' />. 
+
+AI personality screen:  
+
+<img src='/assets/screenshots/AIconf.png?raw=true' width='50%' />. 
 
