@@ -40,6 +40,8 @@ Create a Firebase account, enable authentication, and enable Cloud Firestore.
 
 ## Screenshots
 
+<img src='/assets/screenshots/Login.png?raw=true' width='50%' alt="Login" />
+
 ![Login screen](/assets/screenshots/Login.png?raw=true "Login")
 
 ![Conversations screen](/assets/screenshots/Convos.png?raw=true "Conversations")
