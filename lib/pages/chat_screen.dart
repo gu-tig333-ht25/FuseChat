@@ -216,7 +216,6 @@ class MessagesStream extends StatelessWidget {
 
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (listScrollController.hasClients) {
-            //print("jump");
             listScrollController.jumpTo(
               listScrollController.position.maxScrollExtent,
             );

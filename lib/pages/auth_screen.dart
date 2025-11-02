@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
 import '../models/theme_model.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -34,25 +32,6 @@ class _AuthScreenState extends State<AuthScreen> {
       } else {
         await auth.signup(_emailController.text, _passwordController.text);
       }
-
-      final currentUser = FirebaseAuth.instance.currentUser;
-      if (currentUser != null) {
-        final userRef = FirebaseFirestore.instance
-            .collection('users')
-            .doc(currentUser.uid);
-
-        final doc = await userRef.get();
-        if (!doc.exists) {
-          final email = currentUser.email ?? '';
-          final name = email.contains('@')
-              ? email.split('@').first
-              : currentUser.uid;
-          final cname = name[0].toUpperCase() + name.substring(1);
-          await userRef.set({'name': cname, 'email': email, 'imageUrl': ''});
-        }
-      }
-      // AuthWrapper will automatically navigate to ConversationScreen
-      // No need to manually navigate here
     } catch (error) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -171,7 +150,6 @@ class _AuthScreenState extends State<AuthScreen> {
                         ).colorScheme.secondary,
                         value: themeSettings.isDarkMode,
                         onChanged: (value) {
-                          //print("set toggle $value");
                           themeSettings.isDarkMode = value;
                         },
                       ),

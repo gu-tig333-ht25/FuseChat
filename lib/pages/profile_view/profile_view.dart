@@ -102,7 +102,7 @@ class ProfileView extends StatelessWidget {
                                         value: '$messages',
                                         label: 'Messages',
                                       )
-                                    : Spacer(),
+                                    : SizedBox.shrink(),
                               );
                             },
                           ),
@@ -156,7 +156,6 @@ class ProfileView extends StatelessWidget {
                             ).colorScheme.secondary,
                             value: themeSettings.isDarkMode,
                             onChanged: (value) {
-                              //print("set toggle $value");
                               themeSettings.isDarkMode = value;
                             },
                           ),

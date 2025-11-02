@@ -60,7 +60,6 @@ class FirestoreService {
       }
       return null;
     } catch (e) {
-      //print('Error getting conversation: $e');
       return null;
     }
   }
@@ -100,7 +99,6 @@ class FirestoreService {
         String name = (data['name'] ?? '').trim();
         final email = (data['email'] ?? '').trim();
 
-        // If name is empty, derive from email
         if (name.isEmpty) {
           name = email.split('@').first;
         }
@@ -113,7 +111,7 @@ class FirestoreService {
         return name;
       }
     } catch (e) {
-      //print('Error fetching user name: $e');
+      // Fallback to default if user document doesn't exist
     }
 
     return 'User';
@@ -178,7 +176,6 @@ class FirestoreService {
       await _db.collection('users').doc(userId).update({'name': newName});
       return true;
     } catch (e) {
-      //print('Error updating username: $e');
       return false;
     }
   }
@@ -195,41 +192,33 @@ class FirestoreService {
           String name = (data['name'] ?? '').trim();
           final email = (data['email'] ?? '').trim();
 
-          // Derive name from email if missing
           if (name.isEmpty && email.isNotEmpty) {
             name = email.split('@').first;
           }
 
-          // Cache result for reuse
           _nameCache[userId] = name.isNotEmpty ? name : 'User';
           return _nameCache[userId]!;
         })
         .handleError((error) {
-          //print('Error streaming user name: $error');
           return 'User';
         });
   }
 
-  // Get conversation with messages for LLM
   Stream<Conversation?> getConversationForLLM(String conversationId) async* {
     try {
-      // First, get a stream of the conversation document itself
       final conversationDocStream = _db
           .collection('conversations')
           .doc(conversationId)
           .snapshots();
 
-      // Then, for each conversation snapshot, combine it with its message stream
       await for (final conversationSnapshot in conversationDocStream) {
         if (!conversationSnapshot.exists) {
           yield null;
           continue;
         }
 
-        // Build the Conversation object (you probably already have a fromFirestore)
         final conversation = Conversation.fromFirestore(conversationSnapshot);
 
-        // Now, stream the messages
         final messagesStream = _db
             .collection('conversations')
             .doc(conversationId)
@@ -241,20 +230,16 @@ class FirestoreService {
                   .map((doc) => Message.fromFirestore(doc))
                   .toList();
 
-              // Return the conversation updated with messages
               return conversation.copyWith(messages: messages);
             });
 
-        // Yield the messagesStream so we continue listening
         yield* messagesStream;
       }
     } catch (e) {
-      //print('Error streaming conversation for LLM: $e');
       yield null;
     }
   }
 
-  // Helper to get messages formatted for LLM
   Future<List<Map<String, dynamic>>> getMessagesForLLM(
     String conversationId,
   ) async {
@@ -276,7 +261,6 @@ class FirestoreService {
         };
       }).toList();
     } catch (e) {
-      //print('Error getting messages for LLM: $e');
       return [];
     }
   }

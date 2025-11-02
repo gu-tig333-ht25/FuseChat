@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class MyAuthProvider extends ChangeNotifier {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
@@ -20,6 +21,32 @@ class MyAuthProvider extends ChangeNotifier {
     });
   }
 
+  Future<void> _createUserDocument(User user) async {
+    try {
+      final userRef = FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid);
+      
+      final doc = await userRef.get();
+      if (!doc.exists) {
+        final email = user.email ?? '';
+        final name = email.contains('@')
+            ? email.split('@').first
+            : user.uid;
+        final cname = name.isNotEmpty 
+            ? name[0].toUpperCase() + name.substring(1)
+            : 'User';
+        await userRef.set({
+          'name': cname,
+          'email': email,
+          'imageUrl': '',
+        });
+      }
+    } catch (e) {
+      debugPrint('Error creating user document: $e');
+    }
+  }
+
   Future<void> login(String email, String password) async {
     _setLoading(true);
     try {
@@ -37,10 +64,13 @@ class MyAuthProvider extends ChangeNotifier {
   Future<void> signup(String email, String password) async {
     _setLoading(true);
     try {
-      await _firebaseAuth.createUserWithEmailAndPassword(
+      final credential = await _firebaseAuth.createUserWithEmailAndPassword(
         email: email.trim(),
         password: password,
       );
+      if (credential.user != null) {
+        await _createUserDocument(credential.user!);
+      }
     } on FirebaseAuthException catch (e) {
       throw _getErrorMessage(e);
     } finally {
