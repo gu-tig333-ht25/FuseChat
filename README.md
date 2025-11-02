@@ -36,5 +36,14 @@ The app depends on a Firebase account. If the original account is not available 
 or if you want to make your own version of the app, you need to set up Firebase.
 Create a Firebase account, enable authentication, and enable Cloud Firestore. 
 
+---
 
+## Screenshots
 
+![Login screen](/assets/screenshots/Login.png?raw=true "Login")
+
+![Conversations screen](/assets/screenshots/Convos.png?raw=true "Conversations")
+
+![Chat screen](/assets/screenshots/Chat.png?raw=true "Chat")
+
+![AI Configuration screen](/assets/screenshots/AIconf.png?raw=true "AI Configuration")
